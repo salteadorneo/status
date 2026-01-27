@@ -77,7 +77,7 @@ const formatDate = date => new Date(date).toLocaleString(locale, {
 });
 
 const generateHistoryBar = (history) => {
-  const days = 90;
+  const days = 60;
   const now = new Date();
   const historyMap = new Map();
   
@@ -157,11 +157,26 @@ function generateSparkline(history, width = 900, height = 200) {
   const points = data.map((val, i) => {
     const x = padding + i * step;
     const y = height - padding - ((val - min) / range) * (height - padding * 2);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(' ');
+    return { x, y };
+  });
+  
+  let pathData = `M${points[0].x},${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(i - 1, 0)];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[Math.min(i + 2, points.length - 1)];
+    
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+    
+    pathData += ` C${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
   
   return `<svg width="${width}" height="${height}" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
-  <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="${points}"/>
+  <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="${pathData}"/>
   <text x="5" y="${height - 5}" font-size="10" fill="currentColor" opacity="0.6">${min}ms</text>
   <text x="5" y="12" font-size="10" fill="currentColor" opacity="0.6">${max}ms</text>
 </svg>`;

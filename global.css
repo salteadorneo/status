@@ -88,8 +88,7 @@ details {
   margin: 0.5rem 0;
 
   .history-day {
-    flex: 0 0 calc((100% - 178px) / 90);
-    min-width: 8px;
+    flex: 1;
     aspect-ratio: 1 / 2.5;
     border-radius: 2px;
     background: var(--border-color);
