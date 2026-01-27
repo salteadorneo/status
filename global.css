@@ -109,10 +109,7 @@ a:hover {
   padding: 1rem;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  display: grid;
-  grid-template-columns: 40px 1fr auto;
-  gap: 1rem;
-  align-items: center;
+  display: block;
   text-decoration: none;
   color: inherit;
   transition: border-color 0.2s;
@@ -120,27 +117,46 @@ a:hover {
 
 .service-card:hover {
   border-color: var(--link-color);
+  text-decoration: none;
 }
 
-.service-icon {
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--border-color);
-  border-radius: 4px;
+.service-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.service-name-status {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
 }
 
-.service-icon.up {
-  border-color: var(--up-color);
-  color: var(--up-color);
+.service-name-status h3 {
+  margin: 0;
+  font-size: 1rem;
 }
 
-.service-icon.down {
-  border-color: var(--down-color);
-  color: var(--down-color);
+.service-metrics-inline {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.metric-item {
+  white-space: nowrap;
+}
+
+.service-history {
+  margin-top: 0.5rem;
+}
+
+.history-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-top: 0.25rem;
 }
 
 .service-info h3 {
@@ -166,19 +182,15 @@ a:hover {
 
 .status-badge {
   padding: 0.25rem 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
   font-size: 0.75rem;
   font-weight: bold;
 }
 
 .status-badge.up {
-  border-color: var(--up-color);
   color: var(--up-color);
 }
 
 .status-badge.down {
-  border-color: var(--down-color);
   color: var(--down-color);
 }
 

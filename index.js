@@ -206,9 +206,16 @@ const html = (title, body, cssPath = 'global.css', includeScript = false) => `<!
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title>
-<link rel="stylesheet" href="${cssPath}">
+<link rel="stylesheet" href="${cssPath}" />
 </head>
-<body>${body}<footer><a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">${GITHUB_ICON}salteadorneo/status</a>&nbsp;v${pkg.version}</footer>${includeScript ? `<script>
+<body>
+${body}
+<footer>
+  <a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">
+    ${GITHUB_ICON} salteadorneo/status
+  </a>&nbsp;v${pkg.version}
+</footer>
+${includeScript ? `<script>
 document.addEventListener('DOMContentLoaded', () => {
   const filterBtns = document.querySelectorAll('.filter-btn');
   const historyContainers = document.querySelectorAll('.history-container > div');
@@ -217,14 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const period = btn.dataset.period;
       
-      // Update active button and ARIA attributes
       filterBtns.forEach(b => {
         const isActive = b.dataset.period === period;
         b.classList.toggle('active', isActive);
         b.setAttribute('aria-pressed', isActive);
       });
       
-      // Show/hide history bars by toggling parent div display
       historyContainers.forEach((container, index) => {
         const shouldShow = (period === '60d' && index === 0) || 
                           (period === '30d' && index === 1) || 
@@ -234,7 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
-</script>` : ''}</body>
+</script>` : ''}
+</body>
 </html>`;
 
 const getServiceHistory = (serviceId) => {
@@ -336,21 +342,26 @@ async function checkAllServices() {
     const uptimeCount = allHistory.filter(h => h.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(1) : 100;
     const trend = calculateTrend(allHistory, s.responseTime);
-    const statusIcon = s.status === 'up' ? '●' : '●';
+    const historyBar = generateHistoryBar(allHistory);
     
     return `
     <a href="service/${s.id}.html" class="service-card">
-      <div class="service-icon ${s.status}">
-        ${statusIcon}
+      <div class="service-header-row">
+        <div class="service-name-status">
+          <h3>${s.name}</h3>
+          <span class="status-badge ${s.status}">●</span>
+        </div>
+        <div class="service-metrics-inline">
+          <span class="metric-item">${s.responseTime}ms ${trend}</span>
+          <span class="metric-item">${uptime}%</span>
+        </div>
       </div>
-      <div class="service-info">
-        <h3>${s.name}</h3>
-        <div class="service-url">${s.url}</div>
-      </div>
-      <div class="service-metrics">
-        <span class="status-badge ${s.status}">●</span>
-        <div class="metric-row">${s.responseTime}ms ${trend}</div>
-        <div class="metric-row">${uptime}%</div>
+      <div class="service-history">
+        ${historyBar}
+        <div class="history-labels">
+          <span>60 days ago</span>
+          <span>today</span>
+        </div>
       </div>
     </a>`;
   }).join('');
