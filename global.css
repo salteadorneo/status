@@ -63,6 +63,24 @@ table {
   }
 }
 
+details {
+  margin: 1rem 0;
+
+  summary {
+    cursor: pointer;
+    user-select: none;
+
+    h2 {
+      display: inline-block;
+      margin: 0;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
 .history {
   display: flex;
   gap: 2px;
