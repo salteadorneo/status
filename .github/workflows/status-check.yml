@@ -2,7 +2,7 @@ name: Status Check & Deploy
 
 on:
   schedule:
-    - cron: ${{ vars.SETTINGS_CHECK_INTERVAL || '*/5 * * * *' }}
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -26,9 +26,6 @@ jobs:
       
       - name: Run checks & generate HTML
         run: node scripts/check-urls.js
-        env:
-          SETTINGS_RETRIES: ${{ vars.SETTINGS_RETRIES }}
-          SETTINGS_RETRY_DELAY: ${{ vars.SETTINGS_RETRY_DELAY }}
       
       - name: Commit changes
         run: |

@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const RETRIES = parseInt(process.env.SETTINGS_RETRIES || '3', 10);
-const RETRY_DELAY = parseInt(process.env.SETTINGS_RETRY_DELAY || '1000', 10);
+const RETRIES = 3;
+const RETRY_DELAY = 1000;
 
 // Minimal CSS
 const CSS = `body{font-family:monospace;max-width:900px;margin:2rem auto;padding:0 1rem;background:#fff;color:#000;line-height:1.6}h1{font-size:1.5rem;margin-bottom:.5rem}h2{font-size:1.2rem;margin:1.5rem 0 .5rem}a{color:#00e;text-decoration:underline}.up{color:#0a0}.down{color:#d00}table{width:100%;border-collapse:collapse;margin:1rem 0}th,td{text-align:left;padding:.5rem;border-bottom:1px solid #ddd}th{font-weight:bold}`;
