@@ -82,5 +82,40 @@
     "statusCode": 404,
     "responseTime": 89,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-27T22:31:28.592Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 78,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T22:47:33.037Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 95,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T22:57:18.049Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 58,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T23:09:57.242Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 62,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T23:24:49.359Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 81,
+    "error": null
   }
 ]
