@@ -281,27 +281,70 @@ async function checkAllServices() {
   console.log('Badges generated');
   
   console.log('\nGenerating HTML files...');
-  const servicesRows = results.map(s => {
+  
+  const up = results.filter(s => s.status === 'up').length;
+  const down = results.filter(s => s.status === 'down').length;
+  const avgResponseTime = results.length > 0 ? Math.round(results.reduce((sum, s) => sum + s.responseTime, 0) / results.length) : 0;
+  const totalServices = results.length;
+  
+  const serviceCards = results.map(s => {
     const allHistory = getServiceHistory(s.id);
     const uptimeCount = allHistory.filter(h => h.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(1) : 100;
     const trend = calculateTrend(allHistory, s.responseTime);
-    return `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td><strong>${uptime}%</strong></td><td>${s.responseTime}ms <span title="Response time trend">${trend}</span></td><td>${formatDate(s.timestamp)}</td></tr>`;
+    const statusIcon = s.status === 'up' ? '●' : '●';
+    
+    return `
+    <a href="service/${s.id}.html" class="service-card">
+      <div class="service-icon ${s.status}">
+        ${statusIcon}
+      </div>
+      <div class="service-info">
+        <h3>${s.name}</h3>
+        <div class="service-url">${s.url}</div>
+      </div>
+      <div class="service-metrics">
+        <span class="status-badge ${s.status}">●</span>
+        <div class="metric-row">${s.responseTime}ms ${trend}</div>
+        <div class="metric-row">${uptime}%</div>
+      </div>
+    </a>`;
   }).join('');
-  const up = results.filter(s => s.status === 'up').length;
+  
   const indexHTML = html(lang.statusMonitor, `
     <h1>${lang.statusMonitor}</h1>
-    <p>${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
+    <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
+    
     <h2>${lang.summary}</h2>
-    <p><strong>${up}/${results.length}</strong> ${lang.operationalServices}</p>
+    <div class="stats-grid">
+      <div class="stat-card operational">
+        <div class="label">${lang.operationalServices}</div>
+        <div class="value">${up}/${totalServices}</div>
+        <div class="description">${((up/totalServices)*100).toFixed(0)}%</div>
+      </div>
+      
+      <div class="stat-card issues">
+        <div class="label">${lang.issues || 'Issues'}</div>
+        <div class="value">${down}</div>
+        <div class="description">${down === 0 ? 'none' : 'down'}</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="label">${lang.avgResponseTime || 'Avg Response'}</div>
+        <div class="value">${avgResponseTime}ms</div>
+        <div class="description">average</div>
+      </div>
+    </div>
+    
     <h2>${lang.services}</h2>
-    <table><thead><tr><th>${lang.service}</th><th>${lang.status}</th><th>${lang.uptime}</th><th>${lang.time}</th><th>${lang.lastCheck}</th></tr></thead><tbody>${servicesRows}</tbody></table>
+    <div class="services-grid">
+      ${serviceCards}
+    </div>
   `);
   
   fs.writeFileSync(path.join(__dirname, 'index.html'), indexHTML);
   console.log('Generated index.html');
   
-  // Service pages
   const serviceHtmlDir = path.join(__dirname, 'service');
   if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
@@ -315,7 +358,7 @@ async function checkAllServices() {
     const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
     const incidentsCount = allHistory.filter(s => s.status === 'down').length;
     const lastIncident = allHistory.find(s => s.status === 'down');
-    const lastIncidentText = lastIncident ? `Last incident: ${timeAgo(lastIncident.timestamp)}` : 'No incidents recorded';
+    const lastIncidentText = lastIncident ? `Last incident: ${formatDate(lastIncident.timestamp)}` : 'No incidents recorded';
     const current = results.find(s => s.id === service.id);
     const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
     const historyBar = generateHistoryBar(allHistory);
@@ -323,31 +366,67 @@ async function checkAllServices() {
     
     const checksRows = allHistory.slice(-100).reverse().map(c => {
       const errorText = c.statusCode ? `HTTP ${c.statusCode}${c.error ? ': ' + c.error : ''}` : (c.error || '-');
-      return `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${errorText}</td></tr>`;
+      return `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">●</td><td>${c.responseTime}ms</td><td>${errorText}</td></tr>`;
     }).join('');
-    const historyLinksHTML = historyFiles.map(f => `<li><a href="../api/${service.id}/history/${f}">${f.replace('.json', '')}</a></li>`).join('');
     
     const serviceHTML = html(`${service.name} - ${lang.status}`, `
-      <p><a href="../index.html">${lang.backToDashboard}</a></p>
-      <h1>${service.name}</h1>
-      <p><a href="${service.url}" target="_blank">${service.url}</a></p>
-      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p>${sparkline ? `<p>Response time graph (last 50 checks):</p>${sparkline}` : ''}<p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p><p><strong>${lastIncidentText}</strong></p>` : ''}
-      <h2>Last days</h2>
+      <p><a href="../index.html">← ${lang.backToDashboard}</a></p>
+      
+      <div class="service-header">
+        <h1>${service.name} ${current ? `<span class="${current.status}">●</span>` : ''}</h1>
+        <p><a href="${service.url}" target="_blank">${service.url}</a></p>
+      </div>
+      
+      ${current ? `
+      <div class="service-stats">
+        <div class="service-stat">
+          <div class="label">${lang.responseTime}</div>
+          <div class="value">${current.responseTime}ms ${trend}</div>
+        </div>
+        
+        <div class="service-stat">
+          <div class="label">${lang.uptime}</div>
+          <div class="value">${uptime}%</div>
+        </div>
+        
+        <div class="service-stat">
+          <div class="label">${lang.avgResponseTime}</div>
+          <div class="value">${avgTime}ms</div>
+        </div>
+        
+        <div class="service-stat">
+          <div class="label">${lang.incidents}</div>
+          <div class="value">${incidentsCount}</div>
+        </div>
+        
+        <div class="service-stat">
+          <div class="label">${lang.lastVerification}</div>
+          <div class="value" style="font-size: 0.75rem;">${formatDate(current.timestamp)}</div>
+        </div>
+      </div>
+      
+      <p style="opacity: 0.7; font-size: 0.9rem;">${lastIncidentText}</p>
+      ` : ''}
+      
+      <h2>Last 60 days</h2>
       ${historyBar}
-      <h2>${lang.statsThisMonth}</h2>
-      <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${allHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidentsCount}</td></tr></table>
+      
+      ${sparkline ? `<h2>Response time (last 50 checks)</h2>${sparkline}` : ''}
+      
       <details>
         <summary><h2 style="display: inline-block; cursor: pointer;">${lang.latestChecks} (${allHistory.length > 100 ? 'last 100' : allHistory.length})</h2></summary>
         <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       </details>
+      
       <h2>API Endpoints</h2>
       <p>Programmatic access to status data via JSON REST API:</p>
+      
       <h3 style="margin-bottom:0;">Current Status</h3>
       <p style="margin:0;"><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
       <p style="margin:0;">Returns the current status of this service.</p>
       <details>
         <summary style="cursor: pointer; margin: 0.5rem 0;">Response example</summary>
-        <pre style="background: var(--border-color); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;">{
+        <pre>{
   "lastCheck": "2024-01-27T12:00:00.000Z",
   "status": "up",
   "statusCode": 200,
@@ -356,24 +435,24 @@ async function checkAllServices() {
   "error": null
 }</pre>
       </details>
+      
       <h3 style="margin-bottom:0;">Historical Data</h3>
       <p style="margin:0;"><code>GET /api/${service.id}/history/YYYY-MM.json</code></p>
       <p style="margin:0;">Returns all checks for a specific month.</p>
       <details>
         <summary style="cursor: pointer; margin: 0.5rem 0;">Response example</summary>
-        <pre style="background: var(--border-color); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;">[
-  {
-    "timestamp": "2024-01-27T12:00:00.000Z",
-    "status": "up",
-    "statusCode": 200,
-    "responseTime": 156,
-    "error": null
-  }
-]</pre>
+        <pre>[{
+  "timestamp": "2024-01-27T12:00:00.000Z",
+  "status": "up",
+  "statusCode": 200,
+  "responseTime": 156,
+  "error": null
+}]</pre>
       </details>
+      
       <h2>Badge</h2>
       <p>Use this badge to embed the status in other pages:</p>
-      <pre style="overflow-x: auto;">![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
+      <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
       <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
     `, '../global.css');
     

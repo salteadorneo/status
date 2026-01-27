@@ -14,7 +14,7 @@
   "currentStatus": "Current status (JSON)",
   "monthlyHistory": "Monthly history (JSON)",
   "updatedEvery": "Updated every 5 minutes via GitHub Actions",
-  "backToDashboard": "← Back to dashboard",
+  "backToDashboard": "Back to dashboard",
   "currentState": "Current state",
   "responseTime": "Response time",
   "lastVerification": "Last verification",
@@ -40,5 +40,10 @@
     "m": "m",
     "h": "h",
     "d": "d"
-  }
+  },
+  "operational": "operational",
+  "issues": "Issues",
+  "allOperational": "All systems operational",
+  "servicesDown": "services down",
+  "acrossAllServices": "across all services"
 }

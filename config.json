@@ -10,6 +10,38 @@
       "timeout": 10000
     },
     {
+      "id": "home-assistant",
+      "name": "Home Assistant",
+      "url": "http://homeassistant.local:8123/",
+      "method": "GET",
+      "expectedStatus": 200,
+      "timeout": 10000
+    },
+    {
+      "id": "plex-media-server",
+      "name": "Plex Media Server",
+      "url": "http://192.168.2.10:32400/web/",
+      "method": "GET",
+      "expectedStatus": 200,
+      "timeout": 10000
+    },
+    {
+      "id": "octopi",
+      "name": "OctoPi",
+      "url": "http://octopi.local/",
+      "method": "GET",
+      "expectedStatus": 200,
+      "timeout": 10000
+    },
+    {
+      "id": "home-assistant",
+      "name": "Home Assistant",
+      "url": "http://homeassistant.local:8123/",
+      "method": "GET",
+      "expectedStatus": 200,
+      "timeout": 10000
+    },
+    {
       "id": "example-service",
       "name": "Example Service",
       "url": "https://example.com/health",

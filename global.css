@@ -5,6 +5,7 @@
   --up-color: #0a0;
   --down-color: #d00;
   --border-color: #ddd;
+  --card-bg: #fafafa;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,7 +16,12 @@
     --up-color: #0f0;
     --down-color: #f44;
     --border-color: #444;
+    --card-bg: #1a1a1a;
  }
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -28,18 +34,157 @@ body {
   line-height: 1.6;
 }
 
+header {
+  margin-bottom: 2rem;
+}
+
 h1 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  font-weight: normal;
 }
 
 h2 {
   font-size: 1.2rem;
-  margin: 1.5rem 0 0.5rem;
+  margin: 1.5rem 0 1rem;
+  font-weight: normal;
 }
 
 a {
   color: var(--link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.stat-card .label {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card .description {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.stat-card.operational .value {
+  color: var(--up-color);
+}
+
+.stat-card.issues .value {
+  color: var(--down-color);
+}
+
+.services-grid {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.service-card {
+  background: var(--card-bg);
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s;
+}
+
+.service-card:hover {
+  border-color: var(--link-color);
+}
+
+.service-icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.service-icon.up {
+  border-color: var(--up-color);
+  color: var(--up-color);
+}
+
+.service-icon.down {
+  border-color: var(--down-color);
+  color: var(--down-color);
+}
+
+.service-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: inherit;
+}
+
+.service-info .service-url {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.service-metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.status-badge.up {
+  border-color: var(--up-color);
+  color: var(--up-color);
+}
+
+.status-badge.down {
+  border-color: var(--down-color);
+  color: var(--down-color);
+}
+
+.metric-row {
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
 .up {
@@ -98,6 +243,116 @@ details {
     }
 
     &.down {
+      background: var(--down-color);
+    }
+  }
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+footer svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+  fill: currentColor;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .service-card {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .service-metrics {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.last-update {
+  opacity: 0.6;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.service-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.service-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.service-stat {
+  background: var(--card-bg);
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.service-stat .label {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+
+.service-stat .value {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+pre, code {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+pre {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+/* Ocultar tabla antigua si existe */
+table {
+  display: none;
+}
+
+/* Mostrar tablas en páginas de servicio */
+body:not(:has(.services-grid)) table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+body:not(:has(.services-grid)) table th,
+body:not(:has(.services-grid)) table td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+body:not(:has(.services-grid)) table th {
+  font-weight: bold;
+}
       background: var(--down-color);
     }
   }
