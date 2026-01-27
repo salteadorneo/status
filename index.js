@@ -308,8 +308,9 @@ async function checkAllServices() {
       statusCode: result.statusCode, 
       responseTime: result.responseTime, 
       timestamp: result.timestamp, 
-      error: result.error 
+      error: result.error
     };
+    
     fs.writeFileSync(path.join(serviceDir, 'status.json'), JSON.stringify(statusData, null, 2));
     
     const historyDir = path.join(serviceDir, 'history');
