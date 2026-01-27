@@ -62,16 +62,6 @@ const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'ut
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
 
-const timeAgo = date => {
-  const s = Math.floor((Date.now() - new Date(date)) / 1000);
-  const ago = lang.ago.seconds;
-  if (s < 60) return `${ago} ${s}${lang.timeUnits.s}`;
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${ago} ${m}${lang.timeUnits.m}`;
-  const h = Math.floor(m / 60);
-  return h < 24 ? `${ago} ${h}${lang.timeUnits.h}` : `${ago} ${Math.floor(h / 24)}${lang.timeUnits.d}`;
-};
-
 const formatDate = date => new Date(date).toLocaleString(locale, {
   year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
 });
@@ -92,16 +82,13 @@ const generateHistoryBar = (history, period = '60d') => {
   const now = new Date();
   const historyMap = new Map();
   
-  // Group history entries
   history.forEach(entry => {
     let key;
     const entryDate = new Date(entry.timestamp);
     if (groupBy === 'hour') {
-      // Group by hour for 24h view
       const dateStr = entryDate.toISOString().split('.')[0].substring(0, 13); // YYYY-MM-DDTHH
       key = dateStr;
     } else {
-      // Group by day for 30d and 60d views
       key = entryDate.toISOString().split('T')[0];
     }
     if (!historyMap.has(key)) historyMap.set(key, []);
@@ -468,15 +455,15 @@ async function checkAllServices() {
       ` : ''}
       
       <div class="history-header">
-        <h2>Last 60 days</h2>
+        <h2>History</h2>
         <div class="history-filters">
-          <button class="filter-btn active" data-period="60d" aria-pressed="true">${lang.timePeriod['60d']}</button>
-          <button class="filter-btn" data-period="30d" aria-pressed="false">${lang.timePeriod['30d']}</button>
-          <button class="filter-btn" data-period="24h" aria-pressed="false">${lang.timePeriod['24h']}</button>
+          <button class="filter-btn active" data-period="60d" aria-pressed="true">60d</button>
+          <button class="filter-btn" data-period="30d" aria-pressed="false">30d</button>
+          <button class="filter-btn" data-period="24h" aria-pressed="false">24h</button>
         </div>
       </div>
       <div class="history-container">
-        ${historyBar60d}
+        <div>${historyBar60d}</div>
         <div style="display: none;">${historyBar30d}</div>
         <div style="display: none;">${historyBar24h}</div>
       </div>
