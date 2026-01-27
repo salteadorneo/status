@@ -2,6 +2,53 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+/**
+ * @typedef {Object} Service
+ * @property {string} id - Unique service identifier
+ * @property {string} name - Display name
+ * @property {string} url - URL to check
+ * @property {string} method - HTTP method (GET, POST, etc.)
+ * @property {number} expectedStatus - Expected HTTP status code
+ * @property {number} timeout - Request timeout in milliseconds
+ */
+
+/**
+ * @typedef {Object} CheckResult
+ * @property {string} id - Service identifier
+ * @property {string} name - Service name
+ * @property {string} url - Service URL
+ * @property {'up'|'down'} status - Service status
+ * @property {number|null} statusCode - HTTP status code
+ * @property {number} responseTime - Response time in milliseconds
+ * @property {string} timestamp - ISO timestamp
+ * @property {string|null} error - Error message if down
+ */
+
+/**
+ * @typedef {Object} StatusData
+ * @property {string} lastCheck - ISO timestamp of last check
+ * @property {'up'|'down'} status - Current status
+ * @property {number|null} statusCode - HTTP status code
+ * @property {number} responseTime - Response time in milliseconds
+ * @property {string} timestamp - ISO timestamp
+ * @property {string|null} error - Error message if any
+ */
+
+/**
+ * @typedef {Object} HistoryEntry
+ * @property {string} timestamp - ISO timestamp
+ * @property {'up'|'down'} status - Status at this time
+ * @property {number|null} statusCode - HTTP status code
+ * @property {number} responseTime - Response time in milliseconds
+ * @property {string|null} error - Error message if any
+ */
+
+/**
+ * @typedef {Object} Config
+ * @property {string} language - UI language code (en, es)
+ * @property {Service[]} services - List of services to monitor
+ */
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const RETRIES = 3;
@@ -9,10 +56,16 @@ const RETRY_DELAY = 1000;
 
 const CSS = `body{font-family:monospace;max-width:900px;margin:2rem auto;padding:0 1rem;background:#fff;color:#000;line-height:1.6}h1{font-size:1.5rem;margin-bottom:.5rem}h2{font-size:1.2rem;margin:1.5rem 0 .5rem}a{color:#00e;text-decoration:underline}.up{color:#0a0}.down{color:#d00}table{width:100%;border-collapse:collapse;margin:1rem 0}th,td{text-align:left;padding:.5rem;border-bottom:1px solid #ddd}th{font-weight:bold}@media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#e0e0e0}a{color:#6af}.up{color:#0f0}.down{color:#f44}th,td{border-bottom-color:#444}}`;
 
+/** @type {Config} */
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf-8'));
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
 
+/**
+ * Format time elapsed since a date
+ * @param {string|Date} date - Date to compare
+ * @returns {string} Human-readable time ago string
+ */
 const timeAgo = date => {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
   const prefix = lang.ago.seconds;
@@ -23,10 +76,21 @@ const timeAgo = date => {
   return h < 24 ? `${prefix} ${h}${lang.timeUnits.h}` : `${prefix} ${Math.floor(h / 24)}${lang.timeUnits.d}`;
 };
 
+/**
+ * Format date with locale
+ * @param {string|Date} date - Date to format
+ * @returns {string} Formatted date string
+ */
 const formatDate = date => new Date(date).toLocaleString(locale, {
   year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
 });
 
+/**
+ * Generate HTML document
+ * @param {string} title - Page title
+ * @param {string} body - HTML body content
+ * @returns {string} Complete HTML document
+ */
 const html = (title, body) => `<!DOCTYPE html>
 <html lang="${config.language || 'en'}">
 <head>
@@ -38,6 +102,12 @@ const html = (title, body) => `<!DOCTYPE html>
 <body>${body}</body>
 </html>`;
 
+/**
+ * Check a service URL
+ * @param {Service} service - Service to check
+ * @param {number} [attempt=1] - Current attempt number
+ * @returns {Promise<CheckResult>} Check result
+ */
 async function checkUrl(service, attempt = 1) {
   const start = Date.now();
   try {
@@ -79,6 +149,10 @@ async function checkUrl(service, attempt = 1) {
   }
 }
 
+/**
+ * Check all configured services and generate status pages
+ * @returns {Promise<void>}
+ */
 async function checkAllServices() {
   console.log('Starting status checks...');
   
