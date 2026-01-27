@@ -325,9 +325,37 @@ async function checkAllServices() {
         <summary><h2 style="display: inline-block; cursor: pointer;">${lang.latestChecks} (${allHistory.length > 100 ? 'last 100' : allHistory.length})</h2></summary>
         <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       </details>
-      <h2>${lang.jsonData}</h2>
-      <ul><li><a href="../api/${service.id}/status.json">${lang.currentStatus}</a></li></ul>
-      ${historyLinksHTML ? `<p><strong>${lang.fullHistory}:</strong></p><ul>${historyLinksHTML}</ul>` : ''}
+      <h2>API Endpoints</h2>
+      <p>Programmatic access to status data via JSON REST API:</p>
+      <h3 style="margin-bottom:0;">Current Status</h3>
+      <p style="margin:0;"><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
+      <p style="margin:0;">Returns the current status of this service.</p>
+      <details>
+        <summary style="cursor: pointer; margin: 0.5rem 0;">Response example</summary>
+        <pre style="background: var(--border-color); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;">{
+  "lastCheck": "2024-01-27T12:00:00.000Z",
+  "status": "up",
+  "statusCode": 200,
+  "responseTime": 156,
+  "timestamp": "2024-01-27T12:00:00.000Z",
+  "error": null
+}</pre>
+      </details>
+      <h3 style="margin-bottom:0;">Historical Data</h3>
+      <p style="margin:0;"><code>GET /api/${service.id}/history/YYYY-MM.json</code></p>
+      <p style="margin:0;">Returns all checks for a specific month.</p>
+      <details>
+        <summary style="cursor: pointer; margin: 0.5rem 0;">Response example</summary>
+        <pre style="background: var(--border-color); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem;">[
+  {
+    "timestamp": "2024-01-27T12:00:00.000Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 156,
+    "error": null
+  }
+]</pre>
+      </details>
       <h2>Badge</h2>
       <p>Use this badge to embed the status in other pages:</p>
       <pre style="overflow-x: auto;">![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
