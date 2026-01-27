@@ -275,6 +275,8 @@ async function checkAllServices() {
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(2) : 100;
     const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
     const incidents = allHistory.filter(s => s.status === 'down').slice(-10).reverse();
+    const lastIncident = allHistory.find(s => s.status === 'down');
+    const lastIncidentText = lastIncident ? `Last incident: ${timeAgo(lastIncident.timestamp)}` : 'No incidents recorded';
     const current = results.find(s => s.id === service.id);
     const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
     const historyBar = generateHistoryBar(allHistory);
@@ -287,7 +289,7 @@ async function checkAllServices() {
       <p><a href="../index.html">${lang.backToDashboard}</a></p>
       <h1>${service.name}</h1>
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
-      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p>` : ''}
+      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p><p><strong>${lastIncidentText}</strong></p>` : ''}
       <h2>Last days</h2>
       ${historyBar}
       <h2>${lang.statsThisMonth}</h2>
