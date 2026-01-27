@@ -19,5 +19,68 @@
     "statusCode": 405,
     "responseTime": 104,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-27T20:31:41.935Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 34,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T20:47:47.768Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 66,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T20:58:03.080Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 44,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T21:09:31.090Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 52,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T21:23:52.202Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 76,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T21:36:58.070Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 83,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T21:47:45.315Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 82,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T21:56:50.676Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 115,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T22:10:18.455Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 81,
+    "error": null
   }
 ]

@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="20" role="img" aria-label="salteadorneo.dev: up">
-  <title>salteadorneo.dev: up</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="20" role="img" aria-label="salteadorneo.dev: down">
+  <title>salteadorneo.dev: down</title>
   <style>
     text { font: 11px monospace; fill: #fff; }
     @media (prefers-color-scheme: dark) {
-      rect.status { fill: #0f0; }
+      rect.status { fill: #f44; }
     }
   </style>
   <rect width="106" height="20" fill="#555"/>
-  <rect class="status" x="106" width="22" height="20" fill="#0a0"/>
+  <rect class="status" x="106" width="34" height="20" fill="#d00"/>
   <text x="53" y="14" text-anchor="middle">salteadorneo.dev</text>
-  <text x="117" y="14" text-anchor="middle">up</text>
+  <text x="123" y="14" text-anchor="middle">down</text>
 </svg>

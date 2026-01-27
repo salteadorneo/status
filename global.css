@@ -233,7 +233,8 @@ details {
   margin: 0.5rem 0;
 
   .history-day {
-    flex: 1;
+    flex: 0 0 auto;
+    width: 10px;
     aspect-ratio: 1 / 2.5;
     border-radius: 2px;
     background: var(--border-color);
@@ -246,6 +247,49 @@ details {
       background: var(--down-color);
     }
   }
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem 0 0.5rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.history-filters {
+  display: flex;
+  gap: 0.5rem;
+
+  .filter-btn {
+    padding: 0.3rem 0.6rem;
+    background: var(--border-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &.active {
+      background: var(--link-color);
+      color: var(--bg-color);
+      border-color: var(--link-color);
+    }
+  }
+}
+
+.history-container {
+  position: relative;
+  min-height: 50px;
 }
 
 footer {
@@ -355,8 +399,18 @@ body:not(:has(.services-grid)) table td {
     gap: 1px;
 
     &-day {
-      flex: 0 0 calc((100% - 44px) / 45);
+      width: 8px;
       min-width: 4px;
+    }
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    h2 {
+      margin-bottom: 0;
     }
   }
 }
