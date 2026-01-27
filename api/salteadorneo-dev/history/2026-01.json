@@ -47,5 +47,12 @@
     "statusCode": 200,
     "responseTime": 196,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-27T18:47:25.038Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 380,
+    "error": null
   }
 ]
