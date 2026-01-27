@@ -1,0 +1,49 @@
+name: Status Check & Deploy
+
+on:
+  schedule:
+    - cron: ${{ vars.SETTINGS_CHECK_INTERVAL || '*/5 * * * *' }}
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Run checks & generate HTML
+        run: node scripts/check-urls.js
+        env:
+          SETTINGS_RETRIES: ${{ vars.SETTINGS_RETRIES }}
+          SETTINGS_RETRY_DELAY: ${{ vars.SETTINGS_RETRY_DELAY }}
+      
+      - name: Commit changes
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add index.html service/ data/
+          git diff --staged --quiet || git commit -m "Update status [skip ci]"
+          git push
+      
+      - uses: actions/configure-pages@v4
+      
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

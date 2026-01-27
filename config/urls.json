@@ -1,0 +1,12 @@
+{
+  "services": [
+    {
+      "id": "salteadorneo-dev",
+      "name": "salteadorneo.dev",
+      "url": "https://salteadorneo.dev",
+      "method": "GET",
+      "expectedStatus": 200,
+      "timeout": 10000
+    }
+  ]
+}
