@@ -106,6 +106,14 @@ async function checkAllServices() {
   // Generate HTML files
   console.log('\nGenerating HTML files...');
   
+  // Get available history files
+  const historyFiles = fs.readdirSync(historyDir)
+    .filter(f => f.endsWith('.json'))
+    .sort()
+    .reverse()
+    .map(f => `<li><a href="data/history/${f}">${f.replace('.json', '')}</a></li>`)
+    .join('');
+  
   // Index page
   const servicesRows = results.map(s => `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${s.responseTime}ms</td><td>${timeAgo(s.timestamp)}</td></tr>`).join('');
   const up = results.filter(s => s.status === 'up').length;
@@ -117,7 +125,9 @@ async function checkAllServices() {
     <h2>${lang.services}</h2>
     <table><thead><tr><th>${lang.service}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.lastCheck}</th></tr></thead><tbody>${servicesRows}</tbody></table>
     <h2>${lang.apiJsonData}</h2>
-    <ul><li><a href="data/status.json">${lang.currentStatus}</a></li><li><a href="data/history/">${lang.monthlyHistory}</a></li></ul>
+    <ul><li><a href="data/status.json">${lang.currentStatus}</a></li></ul>
+    <p><strong>${lang.monthlyHistory}:</strong></p>
+    <ul>${historyFiles}</ul>
     <hr><p><small>${lang.updatedEvery}</small></p>
   `);
   
@@ -150,7 +160,9 @@ async function checkAllServices() {
       <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       ${incidentsHTML}
       <h2>${lang.jsonData}</h2>
-      <ul><li><a href="../data/status.json">${lang.currentStatus}</a></li><li><a href="../data/history/">${lang.fullHistory}</a></li></ul>
+      <ul><li><a href="../data/status.json">${lang.currentStatus}</a></li></ul>
+      <p><strong>${lang.fullHistory}:</strong></p>
+      <ul>${historyFiles}</ul>
     `);
     
     fs.writeFileSync(path.join(serviceDir, `${service.id}.html`), serviceHTML);
