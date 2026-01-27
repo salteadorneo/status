@@ -5,6 +5,7 @@
   "description": "Lightweight static status monitoring system for GitHub Pages",
   "license": "MIT",
   "scripts": {
+    "dev": "node --watch index.js",
     "build": "node index.js"
   }
 }
