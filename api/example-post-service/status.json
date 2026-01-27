@@ -1,8 +1,8 @@
 {
-  "lastCheck": "2026-01-27T21:36:58.070Z",
+  "lastCheck": "2026-01-27T21:44:23.647Z",
   "status": "down",
-  "statusCode": 405,
-  "responseTime": 83,
-  "timestamp": "2026-01-27T21:36:58.045Z",
-  "error": null
+  "statusCode": null,
+  "responseTime": 2,
+  "timestamp": "2026-01-27T21:44:21.640Z",
+  "error": "fetch failed"
 }

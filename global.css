@@ -103,6 +103,39 @@ details {
   }
 }
 
+.history-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0 0.5rem;
+
+  .filter-btn {
+    padding: 0.4rem 0.8rem;
+    background: var(--border-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &.active {
+      background: var(--link-color);
+      color: var(--bg-color);
+      border-color: var(--link-color);
+    }
+  }
+}
+
+.history-container {
+  position: relative;
+  min-height: 50px;
+}
+
 @media (max-width: 768px) {
   .history {
     gap: 1px;

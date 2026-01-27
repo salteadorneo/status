@@ -61,5 +61,12 @@
     "statusCode": 404,
     "responseTime": 98,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-27T21:44:23.647Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 2,
+    "error": "fetch failed"
   }
 ]

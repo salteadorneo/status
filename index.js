@@ -76,37 +76,68 @@ const formatDate = date => new Date(date).toLocaleString(locale, {
   year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
 });
 
-const generateHistoryBar = (history) => {
-  const days = 60;
+const generateHistoryBar = (history, period = '60d') => {
+  let days, groupBy;
+  if (period === '24h') {
+    days = 24;
+    groupBy = 'hour';
+  } else if (period === '30d') {
+    days = 30;
+    groupBy = 'day';
+  } else {
+    days = 60;
+    groupBy = 'day';
+  }
+  
   const now = new Date();
   const historyMap = new Map();
   
+  // Group history entries
   history.forEach(entry => {
-    const date = new Date(entry.timestamp).toISOString().split('T')[0];
-    if (!historyMap.has(date)) historyMap.set(date, []);
-    historyMap.get(date).push(entry);
+    let key;
+    const entryDate = new Date(entry.timestamp);
+    if (groupBy === 'hour') {
+      // Group by hour for 24h view
+      const dateStr = entryDate.toISOString().split('.')[0].substring(0, 13); // YYYY-MM-DDTHH
+      key = dateStr;
+    } else {
+      // Group by day for 30d and 60d views
+      key = entryDate.toISOString().split('T')[0];
+    }
+    if (!historyMap.has(key)) historyMap.set(key, []);
+    historyMap.get(key).push(entry);
   });
   
   const bars = [];
   for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    const dayData = historyMap.get(dateStr);
+    let key, title;
+    if (groupBy === 'hour') {
+      const date = new Date(now);
+      date.setHours(date.getHours() - i);
+      key = date.toISOString().split('.')[0].substring(0, 13);
+      const displayTime = date.toLocaleString(locale, { hour: '2-digit', minute: '2-digit' });
+      title = displayTime;
+    } else {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      key = date.toISOString().split('T')[0];
+      title = key;
+    }
+    
+    const periodData = historyMap.get(key);
     
     let status = '';
-    let title = dateStr;
-    if (dayData) {
-      const upCount = dayData.filter(d => d.status === 'up').length;
-      const uptime = (upCount / dayData.length * 100).toFixed(0);
+    if (periodData) {
+      const upCount = periodData.filter(d => d.status === 'up').length;
+      const uptime = (upCount / periodData.length * 100).toFixed(0);
       status = uptime >= 95 ? 'up' : 'down';
-      title = `${dateStr}: ${uptime}% uptime (${dayData.length} checks)`;
+      title = `${title}: ${uptime}% uptime (${periodData.length} checks)`;
     }
     
     bars.push(`<div class="history-day ${status}" title="${title}"></div>`);
   }
   
-  return `<div class="history">${bars.join('')}</div>`;
+  return `<div class="history" data-period="${period}">${bars.join('')}</div>`;
 };
 
 function generateBadge(label, message, status) {
@@ -182,7 +213,7 @@ function generateSparkline(history, width = 900, height = 200) {
 </svg>`;
 }
 
-const html = (title, body, cssPath = 'global.css') => `<!DOCTYPE html>
+const html = (title, body, cssPath = 'global.css', includeScript = false) => `<!DOCTYPE html>
 <html lang="${config.language || 'en'}">
 <head>
 <meta charset="UTF-8">
@@ -190,7 +221,32 @@ const html = (title, body, cssPath = 'global.css') => `<!DOCTYPE html>
 <title>${title}</title>
 <link rel="stylesheet" href="${cssPath}">
 </head>
-<body>${body}<footer><a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">${GITHUB_ICON}salteadorneo/status</a>&nbsp;v${pkg.version}</footer></body>
+<body>${body}<footer><a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">${GITHUB_ICON}salteadorneo/status</a>&nbsp;v${pkg.version}</footer>${includeScript ? `<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const historyBars = document.querySelectorAll('.history');
+  
+  // Initially hide all except 60d
+  historyBars.forEach(bar => {
+    bar.style.display = bar.dataset.period === '60d' ? 'flex' : 'none';
+  });
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const period = btn.dataset.period;
+      
+      // Update active button
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Show/hide history bars
+      historyBars.forEach(bar => {
+        bar.style.display = bar.dataset.period === period ? 'flex' : 'none';
+      });
+    });
+  });
+});
+</script>` : ''}</body>
 </html>`;
 
 const getServiceHistory = (serviceId) => {
@@ -318,7 +374,9 @@ async function checkAllServices() {
     const lastIncidentText = lastIncident ? `Last incident: ${timeAgo(lastIncident.timestamp)}` : 'No incidents recorded';
     const current = results.find(s => s.id === service.id);
     const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
-    const historyBar = generateHistoryBar(allHistory);
+    const historyBar60d = generateHistoryBar(allHistory, '60d');
+    const historyBar30d = generateHistoryBar(allHistory, '30d');
+    const historyBar24h = generateHistoryBar(allHistory, '24h');
     const sparkline = generateSparkline(allHistory);
     
     const checksRows = allHistory.slice(-100).reverse().map(c => {
@@ -333,7 +391,16 @@ async function checkAllServices() {
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
       ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p>${sparkline ? `<p>Response time graph (last 50 checks):</p>${sparkline}` : ''}<p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p><p><strong>${lastIncidentText}</strong></p>` : ''}
       <h2>Last days</h2>
-      ${historyBar}
+      <div class="history-filters">
+        <button class="filter-btn active" data-period="60d">${lang.timePeriod['60d']}</button>
+        <button class="filter-btn" data-period="30d">${lang.timePeriod['30d']}</button>
+        <button class="filter-btn" data-period="24h">${lang.timePeriod['24h']}</button>
+      </div>
+      <div class="history-container">
+        ${historyBar60d}
+        ${historyBar30d}
+        ${historyBar24h}
+      </div>
       <h2>${lang.statsThisMonth}</h2>
       <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${allHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidentsCount}</td></tr></table>
       <details>
@@ -375,7 +442,7 @@ async function checkAllServices() {
       <p>Use this badge to embed the status in other pages:</p>
       <pre style="overflow-x: auto;">![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
       <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
-    `, '../global.css');
+    `, '../global.css', true);
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
