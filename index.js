@@ -143,6 +143,30 @@ function calculateTrend(history, currentTime) {
   return '→';
 }
 
+function generateSparkline(history, width = 900, height = 200) {
+  if (!history || history.length < 2) return '';
+  const data = history.filter(h => h.status === 'up').slice(-50).map(h => h.responseTime);
+  if (data.length < 2) return '';
+  
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+  const padding = 5;
+  const step = (width - padding * 2) / (data.length - 1);
+  
+  const points = data.map((val, i) => {
+    const x = padding + i * step;
+    const y = height - padding - ((val - min) / range) * (height - padding * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  
+  return `<svg width="${width}" height="${height}" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
+  <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="${points}"/>
+  <text x="5" y="${height - 5}" font-size="10" fill="currentColor" opacity="0.6">${min}ms</text>
+  <text x="5" y="12" font-size="10" fill="currentColor" opacity="0.6">${max}ms</text>
+</svg>`;
+}
+
 const html = (title, body, cssPath = 'global.css') => `<!DOCTYPE html>
 <html lang="${config.language || 'en'}">
 <head>
@@ -280,6 +304,7 @@ async function checkAllServices() {
     const current = results.find(s => s.id === service.id);
     const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
     const historyBar = generateHistoryBar(allHistory);
+    const sparkline = generateSparkline(allHistory);
     
     const checksRows = allHistory.slice(-20).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
     const incidentsHTML = incidents.length > 0 ? `<h2>${lang.recentIncidents}</h2><ul>${incidents.map(i => `<li><strong>${formatDate(i.timestamp)}</strong> - ${i.error || 'Error ' + (i.statusCode || 'unknown')}</li>`).join('')}</ul>` : '';
@@ -289,7 +314,7 @@ async function checkAllServices() {
       <p><a href="../index.html">${lang.backToDashboard}</a></p>
       <h1>${service.name}</h1>
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
-      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p><p><strong>${lastIncidentText}</strong></p>` : ''}
+      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p>${sparkline ? `<p>Response time graph (last 50 checks):</p>${sparkline}` : ''}<p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p><p><strong>${lastIncidentText}</strong></p>` : ''}
       <h2>Last days</h2>
       ${historyBar}
       <h2>${lang.statsThisMonth}</h2>
@@ -302,7 +327,7 @@ async function checkAllServices() {
       ${historyLinksHTML ? `<p><strong>${lang.fullHistory}:</strong></p><ul>${historyLinksHTML}</ul>` : ''}
       <h2>Badge</h2>
       <p>Use this badge to embed the status in other pages:</p>
-      <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
+      <pre style="overflow-x: auto;">![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
       <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
     `, '../global.css');
     
