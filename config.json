@@ -10,14 +10,6 @@
       "timeout": 10000
     },
     {
-      "id": "github",
-      "name": "GitHub",
-      "url": "https://api.github.com",
-      "method": "GET",
-      "expectedStatus": 200,
-      "timeout": 10000
-    },
-    {
       "id": "example-service",
       "name": "Example Service",
       "url": "https://example.com/health",
