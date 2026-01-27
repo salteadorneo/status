@@ -77,15 +77,15 @@ const formatDate = date => new Date(date).toLocaleString(locale, {
 });
 
 const generateHistoryBar = (history, period = '60d') => {
-  let days, groupBy;
+  let units, groupBy;
   if (period === '24h') {
-    days = 24;
+    units = 24;
     groupBy = 'hour';
   } else if (period === '30d') {
-    days = 30;
+    units = 30;
     groupBy = 'day';
   } else {
-    days = 60;
+    units = 60;
     groupBy = 'day';
   }
   
@@ -109,7 +109,7 @@ const generateHistoryBar = (history, period = '60d') => {
   });
   
   const bars = [];
-  for (let i = days - 1; i >= 0; i--) {
+  for (let i = units - 1; i >= 0; i--) {
     let key, title;
     if (groupBy === 'hour') {
       const date = new Date(now);
@@ -224,24 +224,25 @@ const html = (title, body, cssPath = 'global.css', includeScript = false) => `<!
 <body>${body}<footer><a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">${GITHUB_ICON}salteadorneo/status</a>&nbsp;v${pkg.version}</footer>${includeScript ? `<script>
 document.addEventListener('DOMContentLoaded', () => {
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const historyBars = document.querySelectorAll('.history');
-  
-  // Initially hide all except 60d
-  historyBars.forEach(bar => {
-    bar.style.display = bar.dataset.period === '60d' ? 'flex' : 'none';
-  });
+  const historyContainers = document.querySelectorAll('.history-container > div');
   
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const period = btn.dataset.period;
       
-      // Update active button
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      // Update active button and ARIA attributes
+      filterBtns.forEach(b => {
+        const isActive = b.dataset.period === period;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-pressed', isActive);
+      });
       
-      // Show/hide history bars
-      historyBars.forEach(bar => {
-        bar.style.display = bar.dataset.period === period ? 'flex' : 'none';
+      // Show/hide history bars by toggling parent div display
+      historyContainers.forEach((container, index) => {
+        const shouldShow = (period === '60d' && index === 0) || 
+                          (period === '30d' && index === 1) || 
+                          (period === '24h' && index === 2);
+        container.style.display = shouldShow ? 'block' : 'none';
       });
     });
   });
@@ -392,14 +393,14 @@ async function checkAllServices() {
       ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p>${sparkline ? `<p>Response time graph (last 50 checks):</p>${sparkline}` : ''}<p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p><p><strong>${lastIncidentText}</strong></p>` : ''}
       <h2>Last days</h2>
       <div class="history-filters">
-        <button class="filter-btn active" data-period="60d">${lang.timePeriod['60d']}</button>
-        <button class="filter-btn" data-period="30d">${lang.timePeriod['30d']}</button>
-        <button class="filter-btn" data-period="24h">${lang.timePeriod['24h']}</button>
+        <button class="filter-btn active" data-period="60d" aria-pressed="true">${lang.timePeriod['60d']}</button>
+        <button class="filter-btn" data-period="30d" aria-pressed="false">${lang.timePeriod['30d']}</button>
+        <button class="filter-btn" data-period="24h" aria-pressed="false">${lang.timePeriod['24h']}</button>
       </div>
       <div class="history-container">
         ${historyBar60d}
-        ${historyBar30d}
-        ${historyBar24h}
+        <div style="display: none;">${historyBar30d}</div>
+        <div style="display: none;">${historyBar24h}</div>
       </div>
       <h2>${lang.statsThisMonth}</h2>
       <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${allHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidentsCount}</td></tr></table>
