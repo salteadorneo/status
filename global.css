@@ -350,14 +350,6 @@ body:not(:has(.services-grid)) table td {
   border-bottom: 1px solid var(--border-color);
 }
 
-body:not(:has(.services-grid)) table th {
-  font-weight: bold;
-}
-      background: var(--down-color);
-    }
-  }
-}
-
 @media (max-width: 768px) {
   .history {
     gap: 1px;
