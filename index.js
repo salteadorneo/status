@@ -298,7 +298,7 @@ async function checkAllServices() {
     const uptimeCount = allHistory.filter(s => s.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(2) : 100;
     const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
-    const incidents = allHistory.filter(s => s.status === 'down').slice(-10).reverse();
+    const incidentsCount = allHistory.filter(s => s.status === 'down').length;
     const lastIncident = allHistory.find(s => s.status === 'down');
     const lastIncidentText = lastIncident ? `Last incident: ${timeAgo(lastIncident.timestamp)}` : 'No incidents recorded';
     const current = results.find(s => s.id === service.id);
@@ -306,8 +306,10 @@ async function checkAllServices() {
     const historyBar = generateHistoryBar(allHistory);
     const sparkline = generateSparkline(allHistory);
     
-    const checksRows = allHistory.slice(-100).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
-    const incidentsHTML = incidents.length > 0 ? `<h2>${lang.recentIncidents}</h2><ul>${incidents.map(i => `<li><strong>${formatDate(i.timestamp)}</strong> - ${i.error || 'Error ' + (i.statusCode || 'unknown')}</li>`).join('')}</ul>` : '';
+    const checksRows = allHistory.slice(-100).reverse().map(c => {
+      const errorText = c.statusCode ? `HTTP ${c.statusCode}${c.error ? ': ' + c.error : ''}` : (c.error || '-');
+      return `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${errorText}</td></tr>`;
+    }).join('');
     const historyLinksHTML = historyFiles.map(f => `<li><a href="../api/${service.id}/history/${f}">${f.replace('.json', '')}</a></li>`).join('');
     
     const serviceHTML = html(`${service.name} - ${lang.status}`, `
@@ -318,12 +320,11 @@ async function checkAllServices() {
       <h2>Last days</h2>
       ${historyBar}
       <h2>${lang.statsThisMonth}</h2>
-      <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${allHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidents.length}</td></tr></table>
+      <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${allHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidentsCount}</td></tr></table>
       <details>
         <summary><h2 style="display: inline-block; cursor: pointer;">${lang.latestChecks} (${allHistory.length > 100 ? 'last 100' : allHistory.length})</h2></summary>
         <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       </details>
-      ${incidentsHTML}
       <h2>${lang.jsonData}</h2>
       <ul><li><a href="../api/${service.id}/status.json">${lang.currentStatus}</a></li></ul>
       ${historyLinksHTML ? `<p><strong>${lang.fullHistory}:</strong></p><ul>${historyLinksHTML}</ul>` : ''}
