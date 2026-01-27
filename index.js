@@ -309,7 +309,7 @@ async function checkAllServices() {
     const uptimeCount = allHistory.filter(h => h.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(1) : 100;
     const trend = calculateTrend(allHistory, s.responseTime);
-    return `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td><strong>${uptime}%</strong></td><td>${s.responseTime}ms <span title="Response time trend">${trend}</span></td><td>${timeAgo(s.timestamp)}</td></tr>`;
+    return `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td><strong>${uptime}%</strong></td><td>${s.responseTime}ms <span title="Response time trend">${trend}</span></td><td>${formatDate(s.timestamp)}</td></tr>`;
   }).join('');
   const up = results.filter(s => s.status === 'up').length;
   const indexHTML = html(lang.statusMonitor, `
