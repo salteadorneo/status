@@ -54,8 +54,6 @@ const __dirname = path.dirname(__filename);
 const RETRIES = 3;
 const RETRY_DELAY = 1000;
 
-const CSS = `body{font-family:monospace;max-width:900px;margin:2rem auto;padding:0 1rem;background:#fff;color:#000;line-height:1.6}h1{font-size:1.5rem;margin-bottom:.5rem}h2{font-size:1.2rem;margin:1.5rem 0 .5rem}a{color:#00e;text-decoration:underline}.up{color:#0a0}.down{color:#d00}table{width:100%;border-collapse:collapse;margin:1rem 0}th,td{text-align:left;padding:.5rem;border-bottom:1px solid #ddd}th{font-weight:bold}footer{margin-top:3rem;padding-top:1rem;border-top:1px solid #ddd;text-align:center;font-size:.9rem;color:#666}footer a{display:inline-flex;align-items:center;gap:.3rem}footer svg{width:1rem;height:1rem;fill:currentColor}@media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#e0e0e0}a{color:#6af}.up{color:#0f0}.down{color:#f44}th,td{border-bottom-color:#444}footer{display:flex;justify-content:center;border-top-color:#444;font-size:12px;color:#999;a{color:#999}}}`;
-
 const GITHUB_ICON = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`;
 
 /** @type {Config} */
@@ -89,18 +87,61 @@ const formatDate = date => new Date(date).toLocaleString(locale, {
 });
 
 /**
+ * Generate visual history for last days
+ * @param {HistoryEntry[]} history - Service history entries
+ * @returns {string} HTML for history visualization
+ */
+const generateHistoryBar = (history) => {
+  const days = 90;
+  const now = new Date();
+  const historyMap = new Map();
+  
+  // Map history by date (YYYY-MM-DD)
+  history.forEach(entry => {
+    const date = new Date(entry.timestamp).toISOString().split('T')[0];
+    if (!historyMap.has(date)) {
+      historyMap.set(date, []);
+    }
+    historyMap.get(date).push(entry);
+  });
+  
+  // Generate last days
+  const bars = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+    const dayData = historyMap.get(dateStr);
+    
+    let status = '';
+    let title = dateStr;
+    if (dayData) {
+      const upCount = dayData.filter(d => d.status === 'up').length;
+      const uptime = (upCount / dayData.length * 100).toFixed(0);
+      status = uptime >= 95 ? 'up' : 'down';
+      title = `${dateStr}: ${uptime}% uptime (${dayData.length} checks)`;
+    }
+    
+    bars.push(`<div class="history-day ${status}" title="${title}"></div>`);
+  }
+  
+  return `<div class="history">${bars.join('')}</div>`;
+};
+
+/**
  * Generate HTML document
  * @param {string} title - Page title
  * @param {string} body - HTML body content
+ * @param {string} [cssPath='global.css'] - Path to CSS file
  * @returns {string} Complete HTML document
  */
-const html = (title, body) => `<!DOCTYPE html>
+const html = (title, body, cssPath = 'global.css') => `<!DOCTYPE html>
 <html lang="${config.language || 'en'}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title>
-<style>${CSS}</style>
+<link rel="stylesheet" href="${cssPath}">
 </head>
 <body>${body}<footer><a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">${GITHUB_ICON}salteadorneo/status</a>&nbsp;v${pkg.version}</footer></body>
 </html>`;
@@ -228,6 +269,7 @@ async function checkAllServices() {
     const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
     const incidents = allHistory.filter(s => s.status === 'down').slice(-10).reverse();
     const current = results.find(s => s.id === service.id);
+    const historyBar = generateHistoryBar(allHistory);
     
     const checksRows = allHistory.slice(-20).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
     const incidentsHTML = incidents.length > 0 ? `<h2>${lang.recentIncidents}</h2><ul>${incidents.map(i => `<li><strong>${formatDate(i.timestamp)}</strong> - ${i.error || 'Error ' + (i.statusCode || 'unknown')}</li>`).join('')}</ul>` : '';
@@ -238,6 +280,8 @@ async function checkAllServices() {
       <h1>${service.name}</h1>
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
       ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms</p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p>` : ''}
+      <h2>Last days</h2>
+      ${historyBar}
       <h2>${lang.statsThisMonth}</h2>
       <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${allHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidents.length}</td></tr></table>
       <h2>${lang.latestChecks}</h2>
@@ -246,7 +290,7 @@ async function checkAllServices() {
       <h2>${lang.jsonData}</h2>
       <ul><li><a href="../api/${service.id}/status.json">${lang.currentStatus}</a></li></ul>
       ${historyLinksHTML ? `<p><strong>${lang.fullHistory}:</strong></p><ul>${historyLinksHTML}</ul>` : ''}
-    `);
+    `, '../global.css');
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
