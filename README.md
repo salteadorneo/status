@@ -1,23 +1,25 @@
 # Status Monitor
 
-A lightweight, static status monitoring system for GitHub Pages. Monitor multiple services with automated checks every 5 minutes, zero dependencies, and a clean minimal interface.
+A lightweight, static status monitoring system for GitHub Pages. Monitor multiple services with automated checks every 10 minutes, zero dependencies, and a clean minimal interface with automatic incident notifications.
 
 ## Features
 
 - 🚀 **Zero Dependencies** - Pure Node.js with ES modules
 - 📊 **Static Site Generation** - Works perfectly with GitHub Pages
 - 🔄 **Automated Checks** - GitHub Actions runs checks every 10 minutes
+- 🔔 **Incident Notifications** - Automatic GitHub Issues creation for service outages
 - 🌐 **REST API** - JSON endpoints for each service
 - 🎨 **Dark Mode Support** - Respects system theme preference
 - 🌍 **Multi-language** - English and Spanish support
-- 📱 **Responsive Design** - Mobile-friendly monospace interface
-- 📈 **Historical Data** - Monthly archives with up to 30 days of history
-- ⚡ **Minimal CSS** - ~500 bytes of inline CSS
+- 📱 **Responsive Design** - Mobile-friendly minimal interface
+- 📈 **Historical Data** - 60-day history visualization on dashboard
+- ⚡ **Minimal CSS** - Clean, monospace design
 
 ## Project Structure
 
 ```
 ├── index.js              # Main script (checks + HTML generation)
+├── manage-issues.js      # GitHub Issues automation
 ├── config.json           # Service configuration
 ├── index.html            # Generated dashboard
 ├── service/              # Generated service detail pages
@@ -81,6 +83,35 @@ This generates:
 2. Select source: **GitHub Actions**
 3. Push to main branch
 4. The workflow will automatically run every 10 minutes
+
+## Incident Notifications
+
+The system automatically creates GitHub Issues when services go down and closes them when services recover.
+
+### How it works
+
+1. **Service goes down** (status changes from `up` to `down`):
+   - Automatically creates a GitHub Issue with label `incident`
+   - Issue title: `🔴 [Service Name] is down`
+   - Includes: URL, error details, timestamp, status code, response time
+   - GitHub sends email notification to repository owner
+
+2. **Service recovers** (status changes from `down` to `up`):
+   - Adds a comment to the existing issue with recovery details
+   - Automatically closes the issue
+   - GitHub sends email notification about the closure
+
+### Configuration
+
+No additional configuration needed! The workflow uses GitHub's built-in `GITHUB_TOKEN` with `issues: write` permission.
+
+**Notification recipients:**
+- Repository owner (automatic)
+- Watchers of the repository
+- Anyone subscribed to the specific issue
+
+**Customization:**
+Edit `manage-issues.js` to modify issue templates, labels, or behavior.
 
 ## Configuration
 
@@ -158,10 +189,31 @@ npm test              # Run tests once
 npm run test:watch    # Run tests in watch mode
 ```
 
-Tests cover:
-- Configuration validation
-- Helper functions (timeAgo, formatDate)
-- Badge generation
+TestDashboard visualization:** Last 60 days displayed on each service card
+- **Service detail pages:** Full historical data and graphs
+- **Automatic cleanup:** Old entries removed when limit reached
+
+## Dashboard
+
+The dashboard displays:
+- **Summary cards**: Operational services, issues, and average response time
+- **Service cards**: Each showing:
+  - Service name wi with clean card-based layout
+- Monospace typography for a minimal aesthetic
+- Status indicators with colored dots (● green/red)
+- 60-day history bars on each service card
+
+### HTML Templates
+
+Modify the generation logic in `index.js` to customize page structure.
+
+### Incident Notifications
+
+Customize issue creation and closure in `manage-issues.js`:
+- Modify issue title format
+- Change issue body template
+- Add custom labels
+- Adjust notification logic
 - Trend calculation
 - File structure verification
 
