@@ -9,21 +9,26 @@ const RETRY_DELAY = 1000;
 
 const CSS = `body{font-family:monospace;max-width:900px;margin:2rem auto;padding:0 1rem;background:#fff;color:#000;line-height:1.6}h1{font-size:1.5rem;margin-bottom:.5rem}h2{font-size:1.2rem;margin:1.5rem 0 .5rem}a{color:#00e;text-decoration:underline}.up{color:#0a0}.down{color:#d00}table{width:100%;border-collapse:collapse;margin:1rem 0}th,td{text-align:left;padding:.5rem;border-bottom:1px solid #ddd}th{font-weight:bold}@media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#e0e0e0}a{color:#6af}.up{color:#0f0}.down{color:#f44}th,td{border-bottom-color:#444}}`;
 
+const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../config/urls.json'), 'utf-8'));
+const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `../lang/${config.language || 'en'}.json`), 'utf-8'));
+const locale = config.language === 'es' ? 'es-ES' : 'en-US';
+
 const timeAgo = date => {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
-  if (s < 60) return `hace ${s}s`;
+  const prefix = lang.ago.seconds;
+  if (s < 60) return `${prefix} ${s}${lang.timeUnits.s}`;
   const m = Math.floor(s / 60);
-  if (m < 60) return `hace ${m}m`;
+  if (m < 60) return `${prefix} ${m}${lang.timeUnits.m}`;
   const h = Math.floor(m / 60);
-  return h < 24 ? `hace ${h}h` : `hace ${Math.floor(h / 24)}d`;
+  return h < 24 ? `${prefix} ${h}${lang.timeUnits.h}` : `${prefix} ${Math.floor(h / 24)}${lang.timeUnits.d}`;
 };
 
-const formatDate = date => new Date(date).toLocaleString('es-ES', {
+const formatDate = date => new Date(date).toLocaleString(locale, {
   year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
 });
 
 const html = (title, body) => `<!DOCTYPE html>
-<html lang="es">
+<html lang="${config.language || 'en'}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -32,8 +37,6 @@ const html = (title, body) => `<!DOCTYPE html>
 </head>
 <body>${body}</body>
 </html>`;
-
-const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../config/urls.json'), 'utf-8'));
 
 async function checkUrl(service, attempt = 1) {
   const start = Date.now();
@@ -104,18 +107,18 @@ async function checkAllServices() {
   console.log('\nGenerating HTML files...');
   
   // Index page
-  const servicesRows = results.map(s => `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? '✓ UP' : '✗ DOWN'}</td><td>${s.responseTime}ms</td><td>${timeAgo(s.timestamp)}</td></tr>`).join('');
+  const servicesRows = results.map(s => `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${s.responseTime}ms</td><td>${timeAgo(s.timestamp)}</td></tr>`).join('');
   const up = results.filter(s => s.status === 'up').length;
-  const indexHTML = html('Status Monitor', `
-    <h1>Status Monitor</h1>
-    <p>Última actualización: ${formatDate(statusData.lastCheck)}</p>
-    <h2>Resumen</h2>
-    <p><strong>${up}/${results.length}</strong> servicios operativos</p>
-    <h2>Servicios</h2>
-    <table><thead><tr><th>Servicio</th><th>Estado</th><th>Tiempo</th><th>Última comprobación</th></tr></thead><tbody>${servicesRows}</tbody></table>
-    <h2>API / Datos JSON</h2>
-    <ul><li><a href="data/status.json">Estado actual (JSON)</a></li><li><a href="data/history/">Historial por mes (JSON)</a></li></ul>
-    <hr><p><small>Actualizado cada 5 minutos vía GitHub Actions</small></p>
+  const indexHTML = html(lang.statusMonitor, `
+    <h1>${lang.statusMonitor}</h1>
+    <p>${lang.lastUpdate}: ${formatDate(statusData.lastCheck)}</p>
+    <h2>${lang.summary}</h2>
+    <p><strong>${up}/${results.length}</strong> ${lang.operationalServices}</p>
+    <h2>${lang.services}</h2>
+    <table><thead><tr><th>${lang.service}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.lastCheck}</th></tr></thead><tbody>${servicesRows}</tbody></table>
+    <h2>${lang.apiJsonData}</h2>
+    <ul><li><a href="data/status.json">${lang.currentStatus}</a></li><li><a href="data/history/">${lang.monthlyHistory}</a></li></ul>
+    <hr><p><small>${lang.updatedEvery}</small></p>
   `);
   
   fs.writeFileSync(path.join(__dirname, '../index.html'), indexHTML);
@@ -133,21 +136,21 @@ async function checkAllServices() {
     const incidents = serviceHistory.filter(s => s.status === 'down').slice(-10).reverse();
     const current = results.find(s => s.id === service.id);
     
-    const checksRows = serviceHistory.slice(-20).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? '✓ UP' : '✗ DOWN'}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
-    const incidentsHTML = incidents.length > 0 ? `<h2>Incidentes Recientes</h2><ul>${incidents.map(i => `<li><strong>${formatDate(i.timestamp)}</strong> - ${i.error || 'Error ' + (i.statusCode || 'desconocido')}</li>`).join('')}</ul>` : '';
+    const checksRows = serviceHistory.slice(-20).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
+    const incidentsHTML = incidents.length > 0 ? `<h2>${lang.recentIncidents}</h2><ul>${incidents.map(i => `<li><strong>${formatDate(i.timestamp)}</strong> - ${i.error || 'Error ' + (i.statusCode || 'unknown')}</li>`).join('')}</ul>` : '';
     
-    const serviceHTML = html(`${service.name} - Status`, `
-      <p><a href="../index.html">← Volver al dashboard</a></p>
+    const serviceHTML = html(`${service.name} - ${lang.status}`, `
+      <p><a href="../index.html">${lang.backToDashboard}</a></p>
       <h1>${service.name}</h1>
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
-      ${current ? `<p><strong>Estado actual:</strong> <span class="${current.status}">${current.status === 'up' ? '✓ UP' : '✗ DOWN'}</span></p><p><strong>Tiempo de respuesta:</strong> ${current.responseTime}ms</p><p><strong>Última verificación:</strong> ${formatDate(current.timestamp)}</p>` : ''}
-      <h2>Estadísticas (este mes)</h2>
-      <table><tr><th>Uptime</th><td>${uptime}% (${uptimeCount}/${serviceHistory.length} checks)</td></tr><tr><th>Tiempo de respuesta promedio</th><td>${avgTime}ms</td></tr><tr><th>Incidentes</th><td>${incidents.length}</td></tr></table>
-      <h2>Últimas Verificaciones</h2>
-      <table><thead><tr><th>Fecha</th><th>Estado</th><th>Tiempo</th><th>Error</th></tr></thead><tbody>${checksRows}</tbody></table>
+      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms</p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p>` : ''}
+      <h2>${lang.statsThisMonth}</h2>
+      <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${serviceHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidents.length}</td></tr></table>
+      <h2>${lang.latestChecks}</h2>
+      <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       ${incidentsHTML}
-      <h2>Datos JSON</h2>
-      <ul><li><a href="../data/status.json">Estado actual</a></li><li><a href="../data/history/">Historial completo</a></li></ul>
+      <h2>${lang.jsonData}</h2>
+      <ul><li><a href="../data/status.json">${lang.currentStatus}</a></li><li><a href="../data/history/">${lang.fullHistory}</a></li></ul>
     `);
     
     fs.writeFileSync(path.join(serviceDir, `${service.id}.html`), serviceHTML);
