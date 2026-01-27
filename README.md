@@ -118,34 +118,9 @@ All endpoints return JSON data:
 GET /api/{service-id}/status.json
 ```
 
-Response:
-```json
-{
-  "lastCheck": "2026-01-27T17:00:00.000Z",
-  "status": "up",
-  "statusCode": 200,
-  "responseTime": 245,
-  "timestamp": "2026-01-27T17:00:00.000Z",
-  "error": null
-}
-```
-
 ### Historical Data
 ```
 GET /api/{service-id}/history/YYYY-MM.json
-```
-
-Response:
-```json
-[
-  {
-    "timestamp": "2026-01-27T17:00:00.000Z",
-    "status": "up",
-    "statusCode": 200,
-    "responseTime": 245,
-    "error": null
-  }
-]
 ```
 
 ## Workflow Configuration

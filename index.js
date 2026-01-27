@@ -486,36 +486,13 @@ async function checkAllServices() {
         <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       </details>
       
-      <h2>API Endpoints</h2>
-      <p>Programmatic access to status data via JSON REST API:</p>
-      
-      <h3 style="margin-bottom:0;">Current Status</h3>
-      <p style="margin:0;"><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
-      <p style="margin:0;">Returns the current status of this service.</p>
       <details>
-        <summary style="cursor: pointer; margin: 0.5rem 0;">Response example</summary>
-        <pre>{
-  "lastCheck": "2024-01-27T12:00:00.000Z",
-  "status": "up",
-  "statusCode": 200,
-  "responseTime": 156,
-  "timestamp": "2024-01-27T12:00:00.000Z",
-  "error": null
-}</pre>
-      </details>
-      
-      <h3 style="margin-bottom:0;">Historical Data</h3>
-      <p style="margin:0;"><code>GET /api/${service.id}/history/YYYY-MM.json</code></p>
-      <p style="margin:0;">Returns all checks for a specific month.</p>
-      <details>
-        <summary style="cursor: pointer; margin: 0.5rem 0;">Response example</summary>
-        <pre>[{
-  "timestamp": "2024-01-27T12:00:00.000Z",
-  "status": "up",
-  "statusCode": 200,
-  "responseTime": 156,
-  "error": null
-}]</pre>
+        <summary><h2>API</h2></summary>
+        <p style="margin:0;"><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
+        <p style="margin:0;">Returns the current status of this service.</p>
+        
+        <p style="margin:0;"><code>GET /api/${service.id}/history/YYYY-MM.json</code></p>
+        <p style="margin:0;">Returns all checks for a specific month.</p>
       </details>
       
       <h2>Badge</h2>
