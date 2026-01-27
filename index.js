@@ -391,11 +391,13 @@ async function checkAllServices() {
       <h1>${service.name}</h1>
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
       ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p>${sparkline ? `<p>Response time graph (last 50 checks):</p>${sparkline}` : ''}<p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p><p><strong>${lastIncidentText}</strong></p>` : ''}
-      <h2>Last days</h2>
-      <div class="history-filters">
-        <button class="filter-btn active" data-period="60d" aria-pressed="true">${lang.timePeriod['60d']}</button>
-        <button class="filter-btn" data-period="30d" aria-pressed="false">${lang.timePeriod['30d']}</button>
-        <button class="filter-btn" data-period="24h" aria-pressed="false">${lang.timePeriod['24h']}</button>
+      <div class="history-header">
+        <h2>Last days</h2>
+        <div class="history-filters">
+          <button class="filter-btn active" data-period="60d" aria-pressed="true">${lang.timePeriod['60d']}</button>
+          <button class="filter-btn" data-period="30d" aria-pressed="false">${lang.timePeriod['30d']}</button>
+          <button class="filter-btn" data-period="24h" aria-pressed="false">${lang.timePeriod['24h']}</button>
+        </div>
       </div>
       <div class="history-container">
         ${historyBar60d}

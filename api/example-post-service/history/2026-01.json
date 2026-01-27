@@ -75,5 +75,12 @@
     "statusCode": null,
     "responseTime": 2,
     "error": "fetch failed"
+  },
+  {
+    "timestamp": "2026-01-27T22:10:29.261Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 2,
+    "error": "fetch failed"
   }
 ]
