@@ -86,68 +86,75 @@ async function checkAllServices() {
   const now = new Date();
   const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   
-  // Save status JSON
-  const statusData = { lastCheck: now.toISOString(), services: results };
-  const dataDir = path.join(__dirname, '../data');
-  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-  fs.writeFileSync(path.join(dataDir, 'status.json'), JSON.stringify(statusData, null, 2));
-  console.log('Status saved to status.json');
-  
-  // Save/update history JSON
-  const historyDir = path.join(dataDir, 'history');
-  if (!fs.existsSync(historyDir)) fs.mkdirSync(historyDir, { recursive: true });
-  const historyPath = path.join(historyDir, `${yearMonth}.json`);
-  let history = fs.existsSync(historyPath) ? JSON.parse(fs.readFileSync(historyPath, 'utf-8')) : [];
-  history.push({ timestamp: now.toISOString(), services: results });
-  if (history.length > 4320) history = history.slice(-4320);
-  fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
-  console.log(`History saved to ${yearMonth}.json`);
+  // Save status and history per service
+  results.forEach(result => {
+    const serviceDir = path.join(__dirname, '../api', result.id);
+    if (!fs.existsSync(serviceDir)) fs.mkdirSync(serviceDir, { recursive: true });
+    
+    // Save individual status.json (without redundant id, name, url)
+    const statusData = { 
+      lastCheck: now.toISOString(), 
+      status: result.status, 
+      statusCode: result.statusCode, 
+      responseTime: result.responseTime, 
+      timestamp: result.timestamp, 
+      error: result.error 
+    };
+    fs.writeFileSync(path.join(serviceDir, 'status.json'), JSON.stringify(statusData, null, 2));
+    
+    // Save/update individual history
+    const historyDir = path.join(serviceDir, 'history');
+    if (!fs.existsSync(historyDir)) fs.mkdirSync(historyDir, { recursive: true });
+    const historyPath = path.join(historyDir, `${yearMonth}.json`);
+    let history = fs.existsSync(historyPath) ? JSON.parse(fs.readFileSync(historyPath, 'utf-8')) : [];
+    history.push({ timestamp: now.toISOString(), status: result.status, statusCode: result.statusCode, responseTime: result.responseTime, error: result.error });
+    if (history.length > 4320) history = history.slice(-4320);
+    fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
+  });
+  console.log('Status and history saved per service');
   
   // Generate HTML files
   console.log('\nGenerating HTML files...');
-  
-  // Get available history files
-  const historyFiles = fs.readdirSync(historyDir)
-    .filter(f => f.endsWith('.json'))
-    .sort()
-    .reverse()
-    .map(f => `<li><a href="data/history/${f}">${f.replace('.json', '')}</a></li>`)
-    .join('');
   
   // Index page
   const servicesRows = results.map(s => `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${s.responseTime}ms</td><td>${timeAgo(s.timestamp)}</td></tr>`).join('');
   const up = results.filter(s => s.status === 'up').length;
   const indexHTML = html(lang.statusMonitor, `
     <h1>${lang.statusMonitor}</h1>
-    <p>${lang.lastUpdate}: ${formatDate(statusData.lastCheck)}</p>
+    <p>${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
     <h2>${lang.summary}</h2>
     <p><strong>${up}/${results.length}</strong> ${lang.operationalServices}</p>
     <h2>${lang.services}</h2>
     <table><thead><tr><th>${lang.service}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.lastCheck}</th></tr></thead><tbody>${servicesRows}</tbody></table>
-    <h2>${lang.apiJsonData}</h2>
-    <ul><li><a href="data/status.json">${lang.currentStatus}</a></li></ul>
-    <p><strong>${lang.monthlyHistory}:</strong></p>
-    <ul>${historyFiles}</ul>
-    <hr><p><small>${lang.updatedEvery}</small></p>
   `);
   
   fs.writeFileSync(path.join(__dirname, '../index.html'), indexHTML);
   console.log('Generated index.html');
   
   // Service pages
-  const serviceDir = path.join(__dirname, '../service');
-  if (!fs.existsSync(serviceDir)) fs.mkdirSync(serviceDir, { recursive: true });
+  const serviceHtmlDir = path.join(__dirname, '../service');
+  if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
   config.services.forEach(service => {
-    const serviceHistory = history.map(h => h.services.find(s => s.id === service.id)).filter(Boolean);
-    const uptimeCount = serviceHistory.filter(s => s.status === 'up').length;
-    const uptime = serviceHistory.length > 0 ? (uptimeCount / serviceHistory.length * 100).toFixed(2) : 100;
-    const avgTime = serviceHistory.length > 0 ? (serviceHistory.reduce((sum, s) => sum + s.responseTime, 0) / serviceHistory.length).toFixed(0) : 0;
-    const incidents = serviceHistory.filter(s => s.status === 'down').slice(-10).reverse();
+    const serviceDir = path.join(__dirname, '../api', service.id);
+    const historyDir = path.join(serviceDir, 'history');
+    
+    // Get all history for this service
+    const historyFiles = fs.existsSync(historyDir) ? fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse() : [];
+    const allHistory = historyFiles.flatMap(file => {
+      const data = JSON.parse(fs.readFileSync(path.join(historyDir, file), 'utf-8'));
+      return data;
+    });
+    
+    const uptimeCount = allHistory.filter(s => s.status === 'up').length;
+    const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(2) : 100;
+    const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
+    const incidents = allHistory.filter(s => s.status === 'down').slice(-10).reverse();
     const current = results.find(s => s.id === service.id);
     
-    const checksRows = serviceHistory.slice(-20).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
+    const checksRows = allHistory.slice(-20).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
     const incidentsHTML = incidents.length > 0 ? `<h2>${lang.recentIncidents}</h2><ul>${incidents.map(i => `<li><strong>${formatDate(i.timestamp)}</strong> - ${i.error || 'Error ' + (i.statusCode || 'unknown')}</li>`).join('')}</ul>` : '';
+    const historyLinksHTML = historyFiles.map(f => `<li><a href="../api/${service.id}/history/${f}">${f.replace('.json', '')}</a></li>`).join('');
     
     const serviceHTML = html(`${service.name} - ${lang.status}`, `
       <p><a href="../index.html">${lang.backToDashboard}</a></p>
@@ -155,17 +162,16 @@ async function checkAllServices() {
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
       ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms</p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p>` : ''}
       <h2>${lang.statsThisMonth}</h2>
-      <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${serviceHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidents.length}</td></tr></table>
+      <table><tr><th>${lang.uptime}</th><td>${uptime}% (${uptimeCount}/${allHistory.length} ${lang.checks})</td></tr><tr><th>${lang.avgResponseTime}</th><td>${avgTime}ms</td></tr><tr><th>${lang.incidents}</th><td>${incidents.length}</td></tr></table>
       <h2>${lang.latestChecks}</h2>
       <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       ${incidentsHTML}
       <h2>${lang.jsonData}</h2>
-      <ul><li><a href="../data/status.json">${lang.currentStatus}</a></li></ul>
-      <p><strong>${lang.fullHistory}:</strong></p>
-      <ul>${historyFiles}</ul>
+      <ul><li><a href="../api/${service.id}/status.json">${lang.currentStatus}</a></li></ul>
+      ${historyLinksHTML ? `<p><strong>${lang.fullHistory}:</strong></p><ul>${historyLinksHTML}</ul>` : ''}
     `);
     
-    fs.writeFileSync(path.join(serviceDir, `${service.id}.html`), serviceHTML);
+    fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
   });
   
