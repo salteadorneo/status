@@ -6,7 +6,7 @@ A lightweight, static status monitoring system for GitHub Pages. Monitor multipl
 
 - 🚀 **Zero Dependencies** - Pure Node.js with ES modules
 - 📊 **Static Site Generation** - Works perfectly with GitHub Pages
-- 🔄 **Automated Checks** - GitHub Actions runs checks every 5 minutes
+- 🔄 **Automated Checks** - GitHub Actions runs checks every 10 minutes
 - 🌐 **REST API** - JSON endpoints for each service
 - 🎨 **Dark Mode Support** - Respects system theme preference
 - 🌍 **Multi-language** - English and Spanish support
@@ -19,13 +19,14 @@ A lightweight, static status monitoring system for GitHub Pages. Monitor multipl
 ```
 ├── index.js              # Main script (checks + HTML generation)
 ├── config.json           # Service configuration
-├── page.html             # Generated dashboard
+├── index.html            # Generated dashboard
 ├── service/              # Generated service detail pages
 ├── api/                  # Generated JSON endpoints
 │   └── {service-id}/
 │       ├── status.json   # Current status
 │       └── history/
 │           └── YYYY-MM.json  # Monthly history
+├── badge/                # Generated status badges
 ├── lang/
 │   ├── en.json           # English translations
 │   └── es.json           # Spanish translations
@@ -79,7 +80,7 @@ This generates:
 1. Enable GitHub Pages in repository Settings → Pages
 2. Select source: **GitHub Actions**
 3. Push to main branch
-4. The workflow will automatically run every 5 minutes
+4. The workflow will automatically run every 10 minutes
 
 ## Configuration
 
@@ -149,7 +150,7 @@ Response:
 
 ## Workflow Configuration
 
-The GitHub Actions workflow (`.github/workflows/status-check.yml`) runs automatically every 5 minutes.
+The GitHub Actions workflow (`.github/workflows/status-check.yml`) runs automatically every 10 minutes.
 
 **Manual trigger:**
 ```bash
@@ -162,7 +163,7 @@ Change check frequency by editing the cron schedule:
 ```yaml
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '*/10 * * * *'  # Every 10 minutes
 ```
 
 ## Development
@@ -172,6 +173,22 @@ on:
 ```bash
 npm run build
 ```
+
+### Running Tests
+
+The project includes basic tests using Node.js native test runner:
+
+```bash
+npm test              # Run tests once
+npm run test:watch    # Run tests in watch mode
+```
+
+Tests cover:
+- Configuration validation
+- Helper functions (timeAgo, formatDate)
+- Badge generation
+- Trend calculation
+- File structure verification
 
 ### Adding Services
 
@@ -194,24 +211,35 @@ const RETRY_DELAY = 1000;
 ## Data Storage
 
 - **Status checks:** Stored per service in `api/{id}/status.json`
-- **History:** Monthly files with max 4,320 entries (30 days × 24h × 6 checks/hour)
+- **History:** Monthly files with max 4,320 entries (~30 days at 10-minute intervals)
+- **Historical visualization:** Last 60 days displayed on service pages
 - **Automatic cleanup:** Old entries removed when limit reached
 
 ## Customization
 
 ### Styling
 
-Edit the CSS constant in `index.js`:
-
-```javascript
-const CSS = `body{...}`;
-```
-
-Current size: ~500 bytes (minified, with dark mode support)
+Edit `global.css` for custom styling. The default theme includes:
+- Dark mode support via `@media (prefers-color-scheme: dark)`
+- Responsive design
+- Monospace typography
+- Minimal footprint
 
 ### HTML Templates
 
 Modify the `html()` function and generation logic in `index.js` to customize page structure.
+
+### Status Badges
+
+Each service has an auto-generated SVG badge available at:
+```
+/badge/{service-id}.svg
+```
+
+Embed in external pages:
+```markdown
+![Service Status](https://your-username.github.io/status/badge/service-id.svg)
+```
 
 ## GitHub Pages Setup
 
