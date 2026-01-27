@@ -28,5 +28,20 @@
         "error": null
       }
     ]
+  },
+  {
+    "timestamp": "2026-01-27T16:48:29.836Z",
+    "services": [
+      {
+        "id": "salteadorneo-dev",
+        "name": "salteadorneo.dev",
+        "url": "https://salteadorneo.dev",
+        "status": "up",
+        "statusCode": 200,
+        "responseTime": 465,
+        "timestamp": "2026-01-27T16:48:29.836Z",
+        "error": null
+      }
+    ]
   }
 ]
