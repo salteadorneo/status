@@ -298,13 +298,18 @@ async function checkAllServices() {
   
   // Index page
   const servicesRows = results.map(s => {
-    // Get history for trend
+    // Get history for trend and uptime
     const serviceDir = path.join(__dirname, 'api', s.id);
     const historyDir = path.join(serviceDir, 'history');
     const historyFiles = fs.existsSync(historyDir) ? fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse() : [];
-    const recentHistory = historyFiles.length > 0 ? JSON.parse(fs.readFileSync(path.join(historyDir, historyFiles[0]), 'utf-8')) : [];
-    const trend = calculateTrend(recentHistory, s.responseTime);
-    return `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${s.responseTime}ms <span title="Response time trend">${trend}</span></td><td>${timeAgo(s.timestamp)}</td></tr>`;
+    const allHistory = historyFiles.flatMap(file => {
+      const data = JSON.parse(fs.readFileSync(path.join(historyDir, file), 'utf-8'));
+      return data;
+    });
+    const uptimeCount = allHistory.filter(h => h.status === 'up').length;
+    const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(1) : 100;
+    const trend = calculateTrend(allHistory, s.responseTime);
+    return `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td><strong>${uptime}%</strong></td><td>${s.responseTime}ms <span title="Response time trend">${trend}</span></td><td>${timeAgo(s.timestamp)}</td></tr>`;
   }).join('');
   const up = results.filter(s => s.status === 'up').length;
   const indexHTML = html(lang.statusMonitor, `
@@ -313,7 +318,7 @@ async function checkAllServices() {
     <h2>${lang.summary}</h2>
     <p><strong>${up}/${results.length}</strong> ${lang.operationalServices}</p>
     <h2>${lang.services}</h2>
-    <table><thead><tr><th>${lang.service}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.lastCheck}</th></tr></thead><tbody>${servicesRows}</tbody></table>
+    <table><thead><tr><th>${lang.service}</th><th>${lang.status}</th><th>${lang.uptime}</th><th>${lang.time}</th><th>${lang.lastCheck}</th></tr></thead><tbody>${servicesRows}</tbody></table>
   `);
   
   fs.writeFileSync(path.join(__dirname, 'index.html'), indexHTML);
