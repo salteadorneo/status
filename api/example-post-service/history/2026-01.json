@@ -5,5 +5,12 @@
     "statusCode": 405,
     "responseTime": 31,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-27T20:00:27.826Z",
+    "status": "down",
+    "statusCode": 405,
+    "responseTime": 68,
+    "error": null
   }
 ]

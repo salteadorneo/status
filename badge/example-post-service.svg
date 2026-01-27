@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="164" height="20" role="img" aria-label="Example POST Service: down">
+  <title>Example POST Service: down</title>
+  <style>
+    text { font: 11px monospace; fill: #fff; }
+    @media (prefers-color-scheme: dark) {
+      rect.status { fill: #f44; }
+    }
+  </style>
+  <rect width="130" height="20" fill="#555"/>
+  <rect class="status" x="130" width="34" height="20" fill="#d00"/>
+  <text x="65" y="14" text-anchor="middle">Example POST Service</text>
+  <text x="147" y="14" text-anchor="middle">down</text>
+</svg>
