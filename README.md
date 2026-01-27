@@ -170,7 +170,7 @@ on:
 ### Local Testing
 
 ```bash
-node index.js
+npm run build
 ```
 
 ### Adding Services
@@ -246,11 +246,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
-
-## Credits
-
-Built with ❤️ using pure Node.js and GitHub Actions.
-
----
-
-**Live Example:** [Your GitHub Pages URL]
