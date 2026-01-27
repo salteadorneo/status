@@ -70,7 +70,8 @@ table {
   margin: 0.5rem 0;
 
   .history-day {
-    flex: 1;
+    flex: 0 0 calc((100% - 178px) / 90);
+    min-width: 8px;
     aspect-ratio: 1 / 2.5;
     border-radius: 2px;
     background: var(--border-color);
@@ -94,6 +95,17 @@ table {
       white-space: nowrap;
       font-size: 11px;
       z-index: 1;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .history {
+    gap: 1px;
+
+    &-day {
+      flex: 0 0 calc((100% - 44px) / 45);
+      min-width: 4px;
     }
   }
 }
