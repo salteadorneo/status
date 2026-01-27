@@ -27,7 +27,7 @@ jobs:
           node-version: '20'
       
       - name: Run checks & generate HTML
-        run: node scripts/check-urls.js
+        run: node index.js
       
       - name: Commit changes
         run: |

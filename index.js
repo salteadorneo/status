@@ -9,8 +9,8 @@ const RETRY_DELAY = 1000;
 
 const CSS = `body{font-family:monospace;max-width:900px;margin:2rem auto;padding:0 1rem;background:#fff;color:#000;line-height:1.6}h1{font-size:1.5rem;margin-bottom:.5rem}h2{font-size:1.2rem;margin:1.5rem 0 .5rem}a{color:#00e;text-decoration:underline}.up{color:#0a0}.down{color:#d00}table{width:100%;border-collapse:collapse;margin:1rem 0}th,td{text-align:left;padding:.5rem;border-bottom:1px solid #ddd}th{font-weight:bold}@media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#e0e0e0}a{color:#6af}.up{color:#0f0}.down{color:#f44}th,td{border-bottom-color:#444}}`;
 
-const config = JSON.parse(fs.readFileSync(path.join(__dirname, '../config/urls.json'), 'utf-8'));
-const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `../lang/${config.language || 'en'}.json`), 'utf-8'));
+const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config/urls.json'), 'utf-8'));
+const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
 
 const timeAgo = date => {
@@ -88,7 +88,7 @@ async function checkAllServices() {
   
   // Save status and history per service
   results.forEach(result => {
-    const serviceDir = path.join(__dirname, '../api', result.id);
+    const serviceDir = path.join(__dirname, 'api', result.id);
     if (!fs.existsSync(serviceDir)) fs.mkdirSync(serviceDir, { recursive: true });
     
     // Save individual status.json (without redundant id, name, url)
@@ -128,15 +128,15 @@ async function checkAllServices() {
     <table><thead><tr><th>${lang.service}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.lastCheck}</th></tr></thead><tbody>${servicesRows}</tbody></table>
   `);
   
-  fs.writeFileSync(path.join(__dirname, '../index.html'), indexHTML);
+  fs.writeFileSync(path.join(__dirname, 'index.html'), indexHTML);
   console.log('Generated index.html');
   
   // Service pages
-  const serviceHtmlDir = path.join(__dirname, '../service');
+  const serviceHtmlDir = path.join(__dirname, 'service');
   if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
   config.services.forEach(service => {
-    const serviceDir = path.join(__dirname, '../api', service.id);
+    const serviceDir = path.join(__dirname, 'api', service.id);
     const historyDir = path.join(serviceDir, 'history');
     
     // Get all history for this service

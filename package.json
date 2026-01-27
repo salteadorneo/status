@@ -3,6 +3,6 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "check": "node scripts/check-urls.js"
+    "build": "node index.js"
   }
 }
