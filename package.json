@@ -1,7 +1,9 @@
 {
   "name": "status",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "description": "Lightweight static status monitoring system for GitHub Pages",
+  "license": "MIT",
   "scripts": {
     "build": "node index.js"
   }
