@@ -6,6 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "node --watch index.js",
-    "build": "node index.js"
+    "build": "node index.js",
+    "test": "node --test",
+    "test:watch": "node --test --watch"
   }
 }
