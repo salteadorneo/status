@@ -62,50 +62,31 @@ const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'ut
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
 
-/**
- * Format time elapsed since a date
- * @param {string|Date} date - Date to compare
- * @returns {string} Human-readable time ago string
- */
 const timeAgo = date => {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
-  const prefix = lang.ago.seconds;
-  if (s < 60) return `${prefix} ${s}${lang.timeUnits.s}`;
+  const ago = lang.ago.seconds;
+  if (s < 60) return `${ago} ${s}${lang.timeUnits.s}`;
   const m = Math.floor(s / 60);
-  if (m < 60) return `${prefix} ${m}${lang.timeUnits.m}`;
+  if (m < 60) return `${ago} ${m}${lang.timeUnits.m}`;
   const h = Math.floor(m / 60);
-  return h < 24 ? `${prefix} ${h}${lang.timeUnits.h}` : `${prefix} ${Math.floor(h / 24)}${lang.timeUnits.d}`;
+  return h < 24 ? `${ago} ${h}${lang.timeUnits.h}` : `${ago} ${Math.floor(h / 24)}${lang.timeUnits.d}`;
 };
 
-/**
- * Format date with locale
- * @param {string|Date} date - Date to format
- * @returns {string} Formatted date string
- */
 const formatDate = date => new Date(date).toLocaleString(locale, {
   year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
 });
 
-/**
- * Generate visual history for last days
- * @param {HistoryEntry[]} history - Service history entries
- * @returns {string} HTML for history visualization
- */
 const generateHistoryBar = (history) => {
   const days = 90;
   const now = new Date();
   const historyMap = new Map();
   
-  // Map history by date (YYYY-MM-DD)
   history.forEach(entry => {
     const date = new Date(entry.timestamp).toISOString().split('T')[0];
-    if (!historyMap.has(date)) {
-      historyMap.set(date, []);
-    }
+    if (!historyMap.has(date)) historyMap.set(date, []);
     historyMap.get(date).push(entry);
   });
   
-  // Generate last days
   const bars = [];
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(now);
@@ -128,18 +109,9 @@ const generateHistoryBar = (history) => {
   return `<div class="history">${bars.join('')}</div>`;
 };
 
-/**
- * Generate SVG status badge
- * @param {string} label - Badge label text
- * @param {string} message - Badge message text
- * @param {'up'|'down'} status - Status for color
- * @returns {string} SVG content
- */
 function generateBadge(label, message, status) {
   const color = status === 'up' ? '#0a0' : '#d00';
   const darkColor = status === 'up' ? '#0f0' : '#f44';
-  
-  // Calculate text widths (approximate, 6px per char)
   const labelWidth = label.length * 6 + 10;
   const messageWidth = message.length * 6 + 10;
   const totalWidth = labelWidth + messageWidth;
@@ -159,35 +131,18 @@ function generateBadge(label, message, status) {
 </svg>`;
 }
 
-/**
- * Calculate response time trend
- * @param {Array} history - Array of history entries
- * @param {number} currentTime - Current response time
- * @returns {string} Trend indicator (↑, ↓, or →)
- */
 function calculateTrend(history, currentTime) {
   if (!history || history.length < 5) return '→';
-  
-  // Get last 10 successful checks
   const recentChecks = history.filter(h => h.status === 'up').slice(-10);
   if (recentChecks.length < 5) return '→';
-  
   const avgRecent = recentChecks.reduce((sum, h) => sum + h.responseTime, 0) / recentChecks.length;
   const diff = currentTime - avgRecent;
-  const threshold = avgRecent * 0.15; // 15% threshold
-  
-  if (diff > threshold) return '↑'; // Slower
-  if (diff < -threshold) return '↓'; // Faster
-  return '→'; // Stable
+  const threshold = avgRecent * 0.15;
+  if (diff > threshold) return '↑';
+  if (diff < -threshold) return '↓';
+  return '→';
 }
 
-/**
- * Generate HTML document
- * @param {string} title - Page title
- * @param {string} body - HTML body content
- * @param {string} [cssPath='global.css'] - Path to CSS file
- * @returns {string} Complete HTML document
- */
 const html = (title, body, cssPath = 'global.css') => `<!DOCTYPE html>
 <html lang="${config.language || 'en'}">
 <head>
@@ -199,12 +154,13 @@ const html = (title, body, cssPath = 'global.css') => `<!DOCTYPE html>
 <body>${body}<footer><a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">${GITHUB_ICON}salteadorneo/status</a>&nbsp;v${pkg.version}</footer></body>
 </html>`;
 
-/**
- * Check a service URL
- * @param {Service} service - Service to check
- * @param {number} [attempt=1] - Current attempt number
- * @returns {Promise<CheckResult>} Check result
- */
+const getServiceHistory = (serviceId) => {
+  const historyDir = path.join(__dirname, 'api', serviceId, 'history');
+  if (!fs.existsSync(historyDir)) return [];
+  const files = fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse();
+  return files.flatMap(f => JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf-8')));
+};
+
 async function checkUrl(service, attempt = 1) {
   const start = Date.now();
   try {
@@ -246,10 +202,6 @@ async function checkUrl(service, attempt = 1) {
   }
 }
 
-/**
- * Check all configured services and generate status pages
- * @returns {Promise<void>}
- */
 async function checkAllServices() {
   console.log('Starting status checks...');
   
@@ -257,12 +209,10 @@ async function checkAllServices() {
   const now = new Date();
   const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   
-  // Save status and history per service
   results.forEach(result => {
     const serviceDir = path.join(__dirname, 'api', result.id);
     if (!fs.existsSync(serviceDir)) fs.mkdirSync(serviceDir, { recursive: true });
     
-    // Save individual status.json (without redundant id, name, url)
     const statusData = { 
       lastCheck: now.toISOString(), 
       status: result.status, 
@@ -273,7 +223,6 @@ async function checkAllServices() {
     };
     fs.writeFileSync(path.join(serviceDir, 'status.json'), JSON.stringify(statusData, null, 2));
     
-    // Save/update individual history
     const historyDir = path.join(serviceDir, 'history');
     if (!fs.existsSync(historyDir)) fs.mkdirSync(historyDir, { recursive: true });
     const historyPath = path.join(historyDir, `${yearMonth}.json`);
@@ -284,7 +233,6 @@ async function checkAllServices() {
   });
   console.log('Status and history saved per service');
   
-  // Generate badges
   const badgeDir = path.join(__dirname, 'badge');
   if (!fs.existsSync(badgeDir)) fs.mkdirSync(badgeDir, { recursive: true });
   results.forEach(result => {
@@ -293,19 +241,9 @@ async function checkAllServices() {
   });
   console.log('Badges generated');
   
-  // Generate HTML files
   console.log('\nGenerating HTML files...');
-  
-  // Index page
   const servicesRows = results.map(s => {
-    // Get history for trend and uptime
-    const serviceDir = path.join(__dirname, 'api', s.id);
-    const historyDir = path.join(serviceDir, 'history');
-    const historyFiles = fs.existsSync(historyDir) ? fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse() : [];
-    const allHistory = historyFiles.flatMap(file => {
-      const data = JSON.parse(fs.readFileSync(path.join(historyDir, file), 'utf-8'));
-      return data;
-    });
+    const allHistory = getServiceHistory(s.id);
     const uptimeCount = allHistory.filter(h => h.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(1) : 100;
     const trend = calculateTrend(allHistory, s.responseTime);
@@ -329,15 +267,9 @@ async function checkAllServices() {
   if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
   config.services.forEach(service => {
-    const serviceDir = path.join(__dirname, 'api', service.id);
-    const historyDir = path.join(serviceDir, 'history');
-    
-    // Get all history for this service
+    const historyDir = path.join(__dirname, 'api', service.id, 'history');
     const historyFiles = fs.existsSync(historyDir) ? fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse() : [];
-    const allHistory = historyFiles.flatMap(file => {
-      const data = JSON.parse(fs.readFileSync(path.join(historyDir, file), 'utf-8'));
-      return data;
-    });
+    const allHistory = getServiceHistory(service.id);
     
     const uptimeCount = allHistory.filter(s => s.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(2) : 100;
