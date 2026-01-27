@@ -160,6 +160,28 @@ function generateBadge(label, message, status) {
 }
 
 /**
+ * Calculate response time trend
+ * @param {Array} history - Array of history entries
+ * @param {number} currentTime - Current response time
+ * @returns {string} Trend indicator (↑, ↓, or →)
+ */
+function calculateTrend(history, currentTime) {
+  if (!history || history.length < 5) return '→';
+  
+  // Get last 10 successful checks
+  const recentChecks = history.filter(h => h.status === 'up').slice(-10);
+  if (recentChecks.length < 5) return '→';
+  
+  const avgRecent = recentChecks.reduce((sum, h) => sum + h.responseTime, 0) / recentChecks.length;
+  const diff = currentTime - avgRecent;
+  const threshold = avgRecent * 0.15; // 15% threshold
+  
+  if (diff > threshold) return '↑'; // Slower
+  if (diff < -threshold) return '↓'; // Faster
+  return '→'; // Stable
+}
+
+/**
  * Generate HTML document
  * @param {string} title - Page title
  * @param {string} body - HTML body content
@@ -275,7 +297,15 @@ async function checkAllServices() {
   console.log('\nGenerating HTML files...');
   
   // Index page
-  const servicesRows = results.map(s => `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${s.responseTime}ms</td><td>${timeAgo(s.timestamp)}</td></tr>`).join('');
+  const servicesRows = results.map(s => {
+    // Get history for trend
+    const serviceDir = path.join(__dirname, 'api', s.id);
+    const historyDir = path.join(serviceDir, 'history');
+    const historyFiles = fs.existsSync(historyDir) ? fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse() : [];
+    const recentHistory = historyFiles.length > 0 ? JSON.parse(fs.readFileSync(path.join(historyDir, historyFiles[0]), 'utf-8')) : [];
+    const trend = calculateTrend(recentHistory, s.responseTime);
+    return `<tr><td><a href="service/${s.id}.html">${s.name}</a></td><td class="${s.status}">${s.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${s.responseTime}ms <span title="Response time trend">${trend}</span></td><td>${timeAgo(s.timestamp)}</td></tr>`;
+  }).join('');
   const up = results.filter(s => s.status === 'up').length;
   const indexHTML = html(lang.statusMonitor, `
     <h1>${lang.statusMonitor}</h1>
@@ -309,6 +339,7 @@ async function checkAllServices() {
     const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
     const incidents = allHistory.filter(s => s.status === 'down').slice(-10).reverse();
     const current = results.find(s => s.id === service.id);
+    const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
     const historyBar = generateHistoryBar(allHistory);
     
     const checksRows = allHistory.slice(-20).reverse().map(c => `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">${c.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</td><td>${c.responseTime}ms</td><td>${c.error || '-'}</td></tr>`).join('');
@@ -319,7 +350,7 @@ async function checkAllServices() {
       <p><a href="../index.html">${lang.backToDashboard}</a></p>
       <h1>${service.name}</h1>
       <p><a href="${service.url}" target="_blank">${service.url}</a></p>
-      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms</p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p>` : ''}
+      ${current ? `<p><strong>${lang.currentState}:</strong> <span class="${current.status}">${current.status === 'up' ? `✓ ${lang.up}` : `✗ ${lang.down}`}</span></p><p><strong>${lang.responseTime}:</strong> ${current.responseTime}ms <span title="Response time trend: ${trend === '↓' ? 'faster' : trend === '↑' ? 'slower' : 'stable'}">${trend}</span></p><p><strong>${lang.lastVerification}:</strong> ${formatDate(current.timestamp)}</p>` : ''}
       <h2>Last days</h2>
       ${historyBar}
       <h2>${lang.statsThisMonth}</h2>
