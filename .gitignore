@@ -7,11 +7,6 @@ package-lock.json
 .env.local
 .env.production
 
-# Generated files (status monitor)
-index.html
-service/
-data/
-
 # Logs
 npm-debug.log*
 yarn-debug.log*
