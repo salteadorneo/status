@@ -89,5 +89,19 @@
     "statusCode": 200,
     "responseTime": 352,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-27T20:00:27.826Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 229,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T20:11:20.043Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 229,
+    "error": null
   }
 ]
