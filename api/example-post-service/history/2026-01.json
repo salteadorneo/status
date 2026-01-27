@@ -63,31 +63,24 @@
     "error": null
   },
   {
-    "timestamp": "2026-01-27T21:44:23.647Z",
+    "timestamp": "2026-01-27T21:47:45.315Z",
     "status": "down",
-    "statusCode": null,
-    "responseTime": 2,
-    "error": "fetch failed"
+    "statusCode": 405,
+    "responseTime": 82,
+    "error": null
   },
   {
-    "timestamp": "2026-01-27T21:49:07.108Z",
+    "timestamp": "2026-01-27T21:56:50.676Z",
     "status": "down",
-    "statusCode": null,
-    "responseTime": 2,
-    "error": "fetch failed"
+    "statusCode": 405,
+    "responseTime": 115,
+    "error": null
   },
   {
-    "timestamp": "2026-01-27T22:10:29.261Z",
+    "timestamp": "2026-01-27T22:10:18.455Z",
     "status": "down",
-    "statusCode": null,
-    "responseTime": 2,
-    "error": "fetch failed"
-  },
-  {
-    "timestamp": "2026-01-27T22:13:17.880Z",
-    "status": "down",
-    "statusCode": null,
-    "responseTime": 2,
-    "error": "fetch failed"
+    "statusCode": 405,
+    "responseTime": 81,
+    "error": null
   }
 ]

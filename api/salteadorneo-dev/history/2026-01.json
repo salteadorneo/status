@@ -147,31 +147,24 @@
     "error": null
   },
   {
-    "timestamp": "2026-01-27T21:44:23.647Z",
-    "status": "down",
-    "statusCode": null,
-    "responseTime": 3,
-    "error": "fetch failed"
+    "timestamp": "2026-01-27T21:47:45.315Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 306,
+    "error": null
   },
   {
-    "timestamp": "2026-01-27T21:49:07.108Z",
-    "status": "down",
-    "statusCode": null,
-    "responseTime": 3,
-    "error": "fetch failed"
+    "timestamp": "2026-01-27T21:56:50.676Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 239,
+    "error": null
   },
   {
-    "timestamp": "2026-01-27T22:10:29.261Z",
-    "status": "down",
-    "statusCode": null,
-    "responseTime": 3,
-    "error": "fetch failed"
-  },
-  {
-    "timestamp": "2026-01-27T22:13:17.880Z",
-    "status": "down",
-    "statusCode": null,
-    "responseTime": 3,
-    "error": "fetch failed"
+    "timestamp": "2026-01-27T22:10:18.455Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 186,
+    "error": null
   }
 ]
