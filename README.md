@@ -18,6 +18,7 @@ A lightweight, static status monitoring system for GitHub Pages. Monitor multipl
 
 ```
 ├── index.js              # Main script (checks + HTML generation)
+├── config.json           # Service configuration
 ├── page.html             # Generated dashboard
 ├── service/              # Generated service detail pages
 ├── api/                  # Generated JSON endpoints
@@ -25,8 +26,6 @@ A lightweight, static status monitoring system for GitHub Pages. Monitor multipl
 │       ├── status.json   # Current status
 │       └── history/
 │           └── YYYY-MM.json  # Monthly history
-├── config/
-│   └── urls.json         # Service configuration
 ├── lang/
 │   ├── en.json           # English translations
 │   └── es.json           # Spanish translations
@@ -45,7 +44,7 @@ cd status
 
 ### 2. Configure Services
 
-Edit `config/urls.json`:
+Edit `config.json`:
 
 ```json
 {
@@ -70,7 +69,7 @@ npm run build
 ```
 
 This generates:
-- `page.html` - Dashboard
+- `index.html` - Dashboard
 - `service/{id}.html` - Service detail pages
 - `api/{id}/status.json` - Current status endpoints
 - `api/{id}/history/YYYY-MM.json` - Historical data
@@ -84,7 +83,7 @@ This generates:
 
 ## Configuration
 
-### Service Configuration (`config/urls.json`)
+### Service Configuration (`config.json`)
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -99,7 +98,7 @@ This generates:
 
 ### Language Support
 
-Change the UI language by editing `config/urls.json`:
+Change the UI language by editing `config.json`:
 
 ```json
 {
@@ -176,7 +175,7 @@ node index.js
 
 ### Adding Services
 
-1. Add service to `config/urls.json`
+1. Add service to `config.json`
 2. Run `npm run build`
 3. Commit and push changes
 
