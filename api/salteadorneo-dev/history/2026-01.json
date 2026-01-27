@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-01-27T17:14:45.006Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 236,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-27T17:15:03.587Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 96,
+    "error": null
+  }
+]
