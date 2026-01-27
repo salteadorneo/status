@@ -129,6 +129,37 @@ const generateHistoryBar = (history) => {
 };
 
 /**
+ * Generate SVG status badge
+ * @param {string} label - Badge label text
+ * @param {string} message - Badge message text
+ * @param {'up'|'down'} status - Status for color
+ * @returns {string} SVG content
+ */
+function generateBadge(label, message, status) {
+  const color = status === 'up' ? '#0a0' : '#d00';
+  const darkColor = status === 'up' ? '#0f0' : '#f44';
+  
+  // Calculate text widths (approximate, 6px per char)
+  const labelWidth = label.length * 6 + 10;
+  const messageWidth = message.length * 6 + 10;
+  const totalWidth = labelWidth + messageWidth;
+  
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${label}: ${message}">
+  <title>${label}: ${message}</title>
+  <style>
+    text { font: 11px monospace; fill: #fff; }
+    @media (prefers-color-scheme: dark) {
+      rect.status { fill: ${darkColor}; }
+    }
+  </style>
+  <rect width="${labelWidth}" height="20" fill="#555"/>
+  <rect class="status" x="${labelWidth}" width="${messageWidth}" height="20" fill="${color}"/>
+  <text x="${labelWidth / 2}" y="14" text-anchor="middle">${label}</text>
+  <text x="${labelWidth + messageWidth / 2}" y="14" text-anchor="middle">${message}</text>
+</svg>`;
+}
+
+/**
  * Generate HTML document
  * @param {string} title - Page title
  * @param {string} body - HTML body content
@@ -231,6 +262,15 @@ async function checkAllServices() {
   });
   console.log('Status and history saved per service');
   
+  // Generate badges
+  const badgeDir = path.join(__dirname, 'badge');
+  if (!fs.existsSync(badgeDir)) fs.mkdirSync(badgeDir, { recursive: true });
+  results.forEach(result => {
+    const badge = generateBadge(result.name, result.status, result.status);
+    fs.writeFileSync(path.join(badgeDir, `${result.id}.svg`), badge);
+  });
+  console.log('Badges generated');
+  
   // Generate HTML files
   console.log('\nGenerating HTML files...');
   
@@ -290,6 +330,10 @@ async function checkAllServices() {
       <h2>${lang.jsonData}</h2>
       <ul><li><a href="../api/${service.id}/status.json">${lang.currentStatus}</a></li></ul>
       ${historyLinksHTML ? `<p><strong>${lang.fullHistory}:</strong></p><ul>${historyLinksHTML}</ul>` : ''}
+      <h2>Badge</h2>
+      <p>Use this badge to embed the status in other pages:</p>
+      <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
+      <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
     `, '../global.css');
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
