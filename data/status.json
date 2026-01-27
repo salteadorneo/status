@@ -1,5 +1,5 @@
 {
-  "lastCheck": "2026-01-27T16:19:39.989Z",
+  "lastCheck": "2026-01-27T16:45:27.765Z",
   "services": [
     {
       "id": "salteadorneo-dev",
@@ -7,8 +7,8 @@
       "url": "https://salteadorneo.dev",
       "status": "up",
       "statusCode": 200,
-      "responseTime": 128,
-      "timestamp": "2026-01-27T16:19:39.987Z",
+      "responseTime": 404,
+      "timestamp": "2026-01-27T16:45:27.765Z",
       "error": null
     }
   ]
