@@ -6,7 +6,10 @@ checks:
   
   - name: Example Service
     url: https://example.com/health
-    maintenance: Mantenimiento programado
+  
+  - name: Example maintenance
+    url: https://example.com/health
+    maintenance: Planned maintenance
   
   - name: Example POST Service
     url: https://example.com/api/status
@@ -20,4 +23,4 @@ checks:
   
   - name: Example DNS
     type: dns
-    domain: github.com
+    domain: example.com
