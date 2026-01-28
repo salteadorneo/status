@@ -2,6 +2,8 @@
 
 A lightweight, static status monitoring system for GitHub Pages. Monitor multiple services with automated checks every 10 minutes, zero dependencies, and a clean minimal interface with automatic incident notifications.
 
+![Web](https://salteadorneo.github.io/status/badge/web.svg)
+
 ## Features
 
 - 🚀 **Zero Dependencies** - Pure Node.js with ES modules
