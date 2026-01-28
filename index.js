@@ -507,7 +507,6 @@ function generateServicePages(results, now) {
               <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json</div>
             </div>
           </div>
-          
           <div class="api-endpoint">
             <div class="endpoint-header">
               <span class="endpoint-url">GET /api/${service.id}/history/YYYY-MM.json</span>
@@ -523,8 +522,12 @@ function generateServicePages(results, now) {
       <details open>
         <summary>${lang.badge}</summary>
         <p>${lang.useBadge}</p>
-        <pre>![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)</pre>
-        <p><img src="${paths.badge}/${service.id}.svg" alt="${service.name} status"></p>
+        <div class="badge-container">
+          <img src="${paths.badge}/${service.id}.svg" alt="${service.name} status" />
+          <div class="badge-code-wrapper">
+            <div class="badge-code" onclick="this.select(); document.execCommand('copy'); this.classList.add('copied');" onmouseout="this.classList.remove('copied');">![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)</div>
+          </div>
+        </div>
       </details>
     `, paths.css, paths.script, config.language, version, config.report, lang.report);
     

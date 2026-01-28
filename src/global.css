@@ -643,9 +643,6 @@ footer {
 }
 
 .endpoint-url {
-  font-family: monospace;
-  font-size: 0.9rem;
-  font-weight: 500;
   color: var(--text-color);
   word-break: break-all;
 }
@@ -668,10 +665,7 @@ footer {
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 0.75rem;
-  font-family: monospace;
-  font-size: 0.85rem;
   word-break: break-all;
-  line-height: 1.4;
   color: var(--link-color);
   user-select: all;
 }
@@ -683,4 +677,35 @@ footer {
 .example-config pre {
   max-width: 600px;
   margin: 1rem auto;
+}
+
+.badge-container {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .badge-container {
+    flex-direction: column;
+  }
+}
+
+.badge-code-wrapper {
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card-bg);
+}
+
+.badge-code {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.75rem;
+  word-break: break-all;
+  color: var(--link-color);
+  user-select: all;
 }
