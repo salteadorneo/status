@@ -431,7 +431,7 @@ function generateServicePages(results, now) {
     
     const serviceHTML = generateHTML(`${service.name} - ${lang.status}`, `
       <header>
-        <h1 class="title">${generateTitle(IS_TEMPLATE ? '../../index.html' : '../index.html')}</h1>
+        <h1 class="title">${generateTitle('../index.html')}</h1>
         ${reportLink ? `<nav>${reportLink}</nav>` : ''}
       </header>
       <main>
