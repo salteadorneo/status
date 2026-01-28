@@ -23,7 +23,7 @@
   "checks": "verificaciones",
   "avgResponseTime": "Tiempo de respuesta promedio",
   "incidents": "Incidentes",
-  "latestChecks": "Últimas Verificaciones",
+  "latestChecks": "Últimas verificaciones",
   "date": "Fecha",
   "error": "Error",
   "recentIncidents": "Incidentes Recientes",
@@ -45,5 +45,17 @@
   "issues": "Problemas",
   "allOperational": "Todos los sistemas operativos",
   "servicesDown": "servicios caídos",
-  "acrossAllServices": "en todos los servicios"
+  "acrossAllServices": "en todos los servicios",
+  "none": "ninguno",
+  "average": "promedio",
+  "today": "hoy",
+  "daysAgo": "días atrás",
+  "lastIncident": "Último incidente",
+  "noIncidents": "No hay incidentes registrados",
+  "history": "Historial",
+  "api": "API",
+  "badge": "Badge",
+  "returnsCurrentStatus": "Devuelve el estado actual de este servicio.",
+  "returnsMonthlyChecks": "Devuelve todas las comprobaciones de un mes específico.",
+  "useBadge": "Usa este badge para mostrar el estado en otras páginas:"
 }

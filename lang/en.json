@@ -45,5 +45,17 @@
   "issues": "Issues",
   "allOperational": "All systems operational",
   "servicesDown": "services down",
-  "acrossAllServices": "across all services"
+  "acrossAllServices": "across all services",
+  "none": "none",
+  "average": "average",
+  "today": "today",
+  "daysAgo": "days ago",
+  "lastIncident": "Last incident",
+  "noIncidents": "No incidents recorded",
+  "history": "History",
+  "api": "API",
+  "badge": "Badge",
+  "returnsCurrentStatus": "Returns the current status of this service.",
+  "returnsMonthlyChecks": "Returns all checks for a specific month.",
+  "useBadge": "Use this badge to embed the status in other pages:"
 }

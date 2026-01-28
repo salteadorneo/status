@@ -383,8 +383,8 @@ async function checkAllServices() {
       <div class="service-history" style="view-transition-name:${s.id}-history">
         ${historyBar}
         <div class="history-labels">
-          <span>60 days ago</span>
-          <span>today</span>
+          <span>60 ${lang.daysAgo}</span>
+          <span>${lang.today}</span>
         </div>
       </div>
     </a>`;
@@ -403,15 +403,15 @@ async function checkAllServices() {
       </div>
       
       <div class="stat-card issues">
-        <div class="label">${lang.issues || 'Issues'}</div>
+        <div class="label">${lang.issues}</div>
         <div class="value">${down}</div>
-        <div class="description">${down === 0 ? 'none' : 'down'}</div>
+        <div class="description">${down === 0 ? lang.none : lang.down}</div>
       </div>
       
       <div class="stat-card">
-        <div class="label">${lang.avgResponseTime || 'Avg Response'}</div>
+        <div class="label">${lang.avgResponseTime}</div>
         <div class="value">${avgResponseTime}ms</div>
-        <div class="description">average</div>
+        <div class="description">${lang.average}</div>
       </div>
     </div>
     
@@ -435,7 +435,7 @@ async function checkAllServices() {
     const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
     const incidentsCount = allHistory.filter(s => s.status === 'down').length;
     const lastIncident = allHistory.find(s => s.status === 'down');
-    const lastIncidentText = lastIncident ? `Last incident: ${formatDate(lastIncident.timestamp)}` : 'No incidents recorded';
+    const lastIncidentText = lastIncident ? `${lang.lastIncident}: ${formatDate(lastIncident.timestamp)}` : lang.noIncidents;
     const current = results.find(s => s.id === service.id);
     const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
     const historyBar60d = generateHistoryBar(allHistory, '60d');
@@ -493,7 +493,7 @@ async function checkAllServices() {
       ` : ''}
       
       <div class="history-header">
-        <h2>History</h2>
+        <h2>${lang.history}</h2>
         <div class="history-filters">
           <button class="filter-btn active" data-period="60d" aria-pressed="true">60d</button>
           <button class="filter-btn" data-period="30d" aria-pressed="false">30d</button>
@@ -506,25 +506,25 @@ async function checkAllServices() {
         <div style="display: none;">${historyBar24h}</div>
       </div>
       
-      ${sparkline ? `<h2>Response time (last 50 checks)</h2>${sparkline}` : ''}
+      ${sparkline ? `<h2>${lang.responseTime}</h2>${sparkline}` : ''}
       
       <details>
-        <summary><h2 style="display: inline-block; cursor: pointer;">${lang.latestChecks} (${allHistory.length > 100 ? 'last 100' : allHistory.length})</h2></summary>
+        <summary>${lang.latestChecks}</summary>
         <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
       </details>
       
       <details>
-        <summary><h2>API</h2></summary>
-        <p style="margin:0;"><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
-        <p style="margin:0;">Returns the current status of this service.</p>
+        <summary>${lang.api}</summary>
+        <p><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
+        <p>${lang.returnsCurrentStatus}</p>
         
-        <p style="margin:0;"><code>GET /api/${service.id}/history/YYYY-MM.json</code></p>
-        <p style="margin:0;">Returns all checks for a specific month.</p>
+        <p><code>GET /api/${service.id}/history/YYYY-MM.json</code></p>
+        <p>${lang.returnsMonthlyChecks}</p>
       </details>
       
       <details>
-        <summary><h2>Badge</h2></summary>
-        <p>Use this badge to embed the status in other pages:</p>
+        <summary>${lang.badge}</summary>
+        <p>${lang.useBadge}</p>
         <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
         <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
       </details>
