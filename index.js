@@ -189,15 +189,19 @@ function generateSparkline(history, width = 900, height = 200) {
   if (data.length < 2) return '';
   
   const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-  const padding = 5;
-  const step = (width - padding * 2) / (data.length - 1);
+  const maxRounded = Math.ceil(max / 100) * 100;
+  const paddingLeft = 50;
+  const paddingRight = 20;
+  const paddingTop = 20;
+  const paddingBottom = 30;
+  const chartWidth = width - paddingLeft - paddingRight;
+  const chartHeight = height - paddingTop - paddingBottom;
+  const step = chartWidth / (data.length - 1);
   
   const points = data.map((val, i) => {
-    const x = padding + i * step;
-    const y = height - padding - ((val - min) / range) * (height - padding * 2);
-    return { x, y };
+    const x = paddingLeft + i * step;
+    const y = paddingTop + chartHeight - (val / maxRounded) * chartHeight;
+    return { x, y, val };
   });
   
   let pathData = `M${points[0].x},${points[0].y}`;
@@ -215,10 +219,27 @@ function generateSparkline(history, width = 900, height = 200) {
     pathData += ` C${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
   }
   
+  const circles = points.map(p => 
+    `<circle cx="${p.x}" cy="${p.y}" r="3" fill="currentColor" opacity="0.7"><title>${p.val}ms</title></circle>`
+  ).join('');
+  
+  const yTicks = [];
+  for (let i = 0; i <= maxRounded; i += 100) {
+    const y = paddingTop + chartHeight - (i / maxRounded) * chartHeight;
+    yTicks.push(`<line x1="${paddingLeft - 5}" y1="${y}" x2="${paddingLeft}" y2="${y}" stroke="currentColor" opacity="0.3" stroke-width="1"/>`);
+    yTicks.push(`<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="currentColor" opacity="0.1" stroke-width="1" stroke-dasharray="2,2"/>`);
+    yTicks.push(`<text x="${paddingLeft - 8}" y="${y + 3}" font-size="10" fill="currentColor" opacity="0.6" text-anchor="end">${i}</text>`);
+  }
+  
+  const axisY = `<line x1="${paddingLeft}" y1="${paddingTop}" x2="${paddingLeft}" y2="${height - paddingBottom}" stroke="currentColor" opacity="0.3" stroke-width="1"/>`;
+  const axisX = `<line x1="${paddingLeft}" y1="${height - paddingBottom}" x2="${width - paddingRight}" y2="${height - paddingBottom}" stroke="currentColor" opacity="0.3" stroke-width="1"/>`;
+  
   return `<svg width="${width}" height="${height}" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
-  <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="${pathData}"/>
-  <text x="5" y="${height - 5}" font-size="10" fill="currentColor" opacity="0.6">${min}ms</text>
-  <text x="5" y="12" font-size="10" fill="currentColor" opacity="0.6">${max}ms</text>
+  ${yTicks.join('')}
+  ${axisX}
+  ${axisY}
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="${pathData}"/>
+  ${circles}
 </svg>`;
 }
 
