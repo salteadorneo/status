@@ -316,48 +316,41 @@ async function checkAllServices() {
   const reportLink = generateReportLink(config.report, lang.report);
   
   const indexHTML = generateHTML(lang.title, `
-    <header class="page-header">
-      <div class="header-left">
-        <a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          salteadorneo/status
-        </a>
-      </div>
+    <header>
+      <h1 class="title">${IS_TEMPLATE ? `<a href="../index.html">${lang.title}</a>` : lang.title}</h1>
       ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
     </header>
     <main>
-    <h1 class="title">${lang.title}</h1>
-    <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
-    
-    <div class="overall-status-banner ${metrics.overallStatus}">
-      ${metrics.overallIcon} ${metrics.overallMessage}
-    </div>
-    
-    <h2>${lang.summary}</h2>
-    <div class="stats-grid">
-      <div class="stat-card operational">
-        <div class="label">${lang.operationalServices}</div>
-        <div class="value">${metrics.up}/${metrics.total}</div>
-        <div class="description">${((metrics.up/metrics.total)*100).toFixed(0)}%</div>
+      <div class="overall-status-banner ${metrics.overallStatus}">
+        <p>${metrics.overallIcon} ${metrics.overallMessage}</p>
+        <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
       </div>
       
-      <div class="stat-card issues">
-        <div class="label">${lang.issues}</div>
-        <div class="value">${metrics.down}</div>
-        <div class="description">${metrics.down === 0 ? lang.none : lang.down}</div>
+      <h2>${lang.summary}</h2>
+      <div class="stats-grid">
+        <div class="stat-card operational">
+          <div class="label">${lang.operationalServices}</div>
+          <div class="value">${metrics.up}/${metrics.total}</div>
+          <div class="description">${((metrics.up/metrics.total)*100).toFixed(0)}%</div>
+        </div>
+        
+        <div class="stat-card issues">
+          <div class="label">${lang.issues}</div>
+          <div class="value">${metrics.down}</div>
+          <div class="description">${metrics.down === 0 ? lang.none : lang.down}</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="label">${lang.avgResponseTime}</div>
+          <div class="value">${metrics.avgResponseTime}ms</div>
+          <div class="description">${lang.average}</div>
+        </div>
       </div>
       
-      <div class="stat-card">
-        <div class="label">${lang.avgResponseTime}</div>
-        <div class="value">${metrics.avgResponseTime}ms</div>
-        <div class="description">${lang.average}</div>
+      <h2>${lang.services}</h2>
+      <div class="services-grid">
+        ${serviceCards}
       </div>
-    </div>
-    
-    <h2>${lang.services}</h2>
-    <div class="services-grid">
-      ${serviceCards}
-    </div>
     </main>
   `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, version, config.report, lang.report, IS_TEMPLATE ? lang.demoBannerIndex : null);
   
@@ -417,119 +410,111 @@ function generateServicePages(results, now) {
     const reportLink = generateReportLink(config.report, lang.report);
     
     const serviceHTML = generateHTML(`${service.name} - ${lang.status}`, `
-      <header class="page-header">
-        <div class="header-left">
-          <a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            salteadorneo/status
-          </a>
-        </div>
+      <header>
+        <h1 class="title">${IS_TEMPLATE ? `<a href="../../index.html">${lang.title}</a>` : lang.title}</h1>
         ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
       </header>
-      <main>
-      <h1 class="title">${lang.title}</h1>
-      <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString(), locale)}</p>
-      
-      <p><a href="../index.html">← ${lang.backToDashboard}</a></p>
-      
-      <div class="service-header">
-        <h2 style="view-transition-name:${service.id}">
-          ${service.name} <span class="${current.status}">●</span>
-        </h2>
-        <p>${getMethodBadge(service)} <span style="opacity: 0.8;">${getServiceUrl(service)}</span></p>
-      </div>
-      
-      ${current ? `
-      <div class="service-stats">
-        <div class="service-stat">
-          <div class="label">${lang.responseTime}</div>
-          <div class="value">${current.responseTime}ms ${trend}</div>
+      <main>        
+        <p><a href="../index.html">← ${lang.backToDashboard}</a></p>
+        
+        <div class="service-header">
+          <h2 style="view-transition-name:${service.id}">
+            ${service.name} <span class="${current.status}">●</span>
+          </h2>
+          <p>${getMethodBadge(service)} <span style="opacity: 0.8;">${getServiceUrl(service)}</span></p>
         </div>
         
-        <div class="service-stat">
-          <div class="label">${lang.uptime}</div>
-          <div class="value">${uptime}%</div>
-        </div>
-        
-        <div class="service-stat">
-          <div class="label">${lang.avgResponseTime}</div>
-          <div class="value">${avgTime}ms</div>
-        </div>
-        
-        <div class="service-stat">
-          <div class="label">${lang.incidents}</div>
-          <div class="value">${incidentsCount}</div>
-        </div>
-        
-        <div class="service-stat">
-          <div class="label">${lang.lastVerification}</div>
-          <div class="value" style="font-size: 0.75rem;">${formatDate(current.timestamp, locale)}</div>
-        </div>
-      </div>
-      
-      <p style="opacity: 0.7; font-size: 0.9rem;">${lastIncidentText}</p>
-      ` : ''}
-      
-      <div class="history-header">
-        <h2>${lang.history}</h2>
-        <div class="history-filters">
-          <button class="filter-btn" data-period="24h" aria-pressed="false">24h</button>
-          <button class="filter-btn active" data-period="72h" aria-pressed="false">72h</button>
-          <button class="filter-btn" data-period="30d" aria-pressed="false">30d</button>
-          <button class="filter-btn" data-period="60d" aria-pressed="true">60d</button>
-        </div>
-      </div>
-      <div class="history-container" style="view-transition-name:${service.id}-history">
-      <div style="display: none;">${historyBar24h}</div>
-      <div>${historyBar72h}</div>
-      <div style="display: none;">${historyBar30d}</div>
-      <div style="display: none;">${historyBar60d}</div>
-      </div>
-      
-      ${sparkline ? `<h2>${lang.responseTime}</h2>${sparkline}` : ''}
-      
-      <details open>
-        <summary>${lang.latestChecks}</summary>
-        <table>
-          <thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead>
-          <tbody>${checksRows}</tbody>
-        </table>
-      </details>
-      
-      <details open>
-        <summary>${lang.api}</summary>
-        <div class="api-endpoints">
-          <div class="api-endpoint">
-            <div class="endpoint-header">
-              <span class="endpoint-url">GET /api/${service.id}/status.json</span>
-            </div>
-            <p class="endpoint-description">${lang.returnsCurrentStatus}</p>
-            <div class="endpoint-request">
-              <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json</div>
-            </div>
+        ${current ? `
+        <div class="service-stats">
+          <div class="service-stat">
+            <div class="label">${lang.responseTime}</div>
+            <div class="value">${current.responseTime}ms ${trend}</div>
           </div>
-          <div class="api-endpoint">
-            <div class="endpoint-header">
-              <span class="endpoint-url">GET /api/${service.id}/history/YYYY-MM.json</span>
-            </div>
-            <p class="endpoint-description">${lang.returnsMonthlyChecks}</p>
-            <div class="endpoint-request">
-              <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json</div>
-            </div>
+          
+          <div class="service-stat">
+            <div class="label">${lang.uptime}</div>
+            <div class="value">${uptime}%</div>
+          </div>
+          
+          <div class="service-stat">
+            <div class="label">${lang.avgResponseTime}</div>
+            <div class="value">${avgTime}ms</div>
+          </div>
+          
+          <div class="service-stat">
+            <div class="label">${lang.incidents}</div>
+            <div class="value">${incidentsCount}</div>
+          </div>
+          
+          <div class="service-stat">
+            <div class="label">${lang.lastVerification}</div>
+            <div class="value" style="font-size: 0.75rem;">${formatDate(current.timestamp, locale)}</div>
           </div>
         </div>
-      </details>
-      
-      <details open>
-        <summary>${lang.badge}</summary>
-        <p>${lang.useBadge}</p>
-        <div class="badge-container">
-          <img src="${paths.badge}/${service.id}.svg" alt="${service.name} status" />
-          <div class="badge-code-wrapper">
-            <div class="badge-code" onclick="this.select(); document.execCommand('copy'); this.classList.add('copied');" onmouseout="this.classList.remove('copied');">![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)</div>
+        
+        <p style="opacity: 0.7; font-size: 0.9rem;">${lastIncidentText}</p>
+        ` : ''}
+        
+        <div class="history-header">
+          <h2>${lang.history}</h2>
+          <div class="history-filters">
+            <button class="filter-btn" data-period="24h" aria-pressed="false">24h</button>
+            <button class="filter-btn active" data-period="72h" aria-pressed="false">72h</button>
+            <button class="filter-btn" data-period="30d" aria-pressed="false">30d</button>
+            <button class="filter-btn" data-period="60d" aria-pressed="true">60d</button>
           </div>
         </div>
-      </details>
+        <div class="history-container" style="view-transition-name:${service.id}-history">
+        <div style="display: none;">${historyBar24h}</div>
+        <div>${historyBar72h}</div>
+        <div style="display: none;">${historyBar30d}</div>
+        <div style="display: none;">${historyBar60d}</div>
+        </div>
+        
+        ${sparkline ? `<h2>${lang.responseTime}</h2>${sparkline}` : ''}
+        
+        <details open>
+          <summary>${lang.latestChecks}</summary>
+          <table>
+            <thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead>
+            <tbody>${checksRows}</tbody>
+          </table>
+        </details>
+        
+        <details open>
+          <summary>${lang.api}</summary>
+          <div class="api-endpoints">
+            <div class="api-endpoint">
+              <div class="endpoint-header">
+                <span class="endpoint-url">GET /api/${service.id}/status.json</span>
+              </div>
+              <p class="endpoint-description">${lang.returnsCurrentStatus}</p>
+              <div class="endpoint-request">
+                <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json</div>
+              </div>
+            </div>
+            <div class="api-endpoint">
+              <div class="endpoint-header">
+                <span class="endpoint-url">GET /api/${service.id}/history/YYYY-MM.json</span>
+              </div>
+              <p class="endpoint-description">${lang.returnsMonthlyChecks}</p>
+              <div class="endpoint-request">
+                <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json</div>
+              </div>
+            </div>
+          </div>
+        </details>
+        
+        <details open>
+          <summary>${lang.badge}</summary>
+          <p>${lang.useBadge}</p>
+          <div class="badge-container">
+            <img src="${paths.badge}/${service.id}.svg" alt="${service.name} status" />
+            <div class="badge-code-wrapper">
+              <div class="badge-code" onclick="this.select(); document.execCommand('copy'); this.classList.add('copied');" onmouseout="this.classList.remove('copied');">![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)</div>
+            </div>
+          </div>
+        </details>
       </main>
     `, paths.css, paths.script, config.language, version, config.report, lang.report, IS_TEMPLATE ? lang.demoBanner : null);
     
@@ -546,80 +531,80 @@ function generateLandingPage() {
   
   const landingHTML = generateHTML('Status - Zero-dependency GitHub Pages uptime monitoring', `
     <main>
-    <div class="landing-hero">
-      <h1 class="landing-title">📊 Status</h1>
-      <p class="landing-subtitle">Zero-dependency uptime monitoring for GitHub Pages</p>
-      <div class="landing-cta">
-        <a href="demo/index.html" class="btn btn-primary">View Demo</a>
-        <a href="https://github.com/salteadorneo/status" class="btn btn-secondary" target="_blank">Use Template</a>
-      </div>
-    </div>
-
-    <div class="features">
-      <h2>Features</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <h3>🚀 Zero Dependencies</h3>
-          <p>Pure Node.js with ES modules. No external packages needed.</p>
-        </div>
-        <div class="feature-card">
-          <h3>📊 Static Generation</h3>
-          <p>Works perfectly with GitHub Pages. No servers required.</p>
-        </div>
-        <div class="feature-card">
-          <h3>🔄 Automated Checks</h3>
-          <p>GitHub Actions runs checks every 10 minutes automatically.</p>
-        </div>
-        <div class="feature-card">
-          <h3>🔔 Issue Tracking</h3>
-          <p>Automatic GitHub Issues creation for service outages.</p>
-        </div>
-        <div class="feature-card">
-          <h3>🌐 JSON API</h3>
-          <p>RESTful endpoints for each service status and history.</p>
-        </div>
-        <div class="feature-card">
-          <h3>🎨 Dark Mode</h3>
-          <p>Minimal design that respects system theme preference.</p>
+      <div class="landing-hero">
+        <h1 class="landing-title">📊 Status</h1>
+        <p class="landing-subtitle">Zero-dependency uptime monitoring for GitHub Pages</p>
+        <div class="landing-cta">
+          <a href="demo/index.html" class="btn btn-primary">View Demo</a>
+          <a href="https://github.com/salteadorneo/status" class="btn btn-secondary" target="_blank">Use Template</a>
         </div>
       </div>
-    </div>
 
-    <div class="quick-start">
-      <h2>Quick Start</h2>
-      <ol>
-        <li>
-          <strong>Use this template</strong>
-          <pre>Click "Use this template" button on GitHub</pre>
-        </li>
-        <li>
-          <strong>Configure services</strong>
-          <pre>Edit config.yml with your services to monitor</pre>
-        </li>
-        <li>
-          <strong>Enable GitHub Pages</strong>
-          <pre>Settings → Pages → Deploy from main branch</pre>
-        </li>
-        <li>
-          <strong>Done!</strong>
-          <pre>Your status page will be live at username.github.io/repo</pre>
-        </li>
-      </ol>
-    </div>
+      <div class="features">
+        <h2>Features</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h3>🚀 Zero Dependencies</h3>
+            <p>Pure Node.js with ES modules. No external packages needed.</p>
+          </div>
+          <div class="feature-card">
+            <h3>📊 Static Generation</h3>
+            <p>Works perfectly with GitHub Pages. No servers required.</p>
+          </div>
+          <div class="feature-card">
+            <h3>🔄 Automated Checks</h3>
+            <p>GitHub Actions runs checks every 10 minutes automatically.</p>
+          </div>
+          <div class="feature-card">
+            <h3>🔔 Issue Tracking</h3>
+            <p>Automatic GitHub Issues creation for service outages.</p>
+          </div>
+          <div class="feature-card">
+            <h3>🌐 JSON API</h3>
+            <p>RESTful endpoints for each service status and history.</p>
+          </div>
+          <div class="feature-card">
+            <h3>🎨 Dark Mode</h3>
+            <p>Minimal design that respects system theme preference.</p>
+          </div>
+        </div>
+      </div>
 
-    <div class="example-config">
-      <h2>Configuration Example</h2>
-      <pre><code>language: en
+      <div class="quick-start">
+        <h2>Quick Start</h2>
+        <ol>
+          <li>
+            <strong>Use this template</strong>
+            <pre>Click "Use this template" button on GitHub</pre>
+          </li>
+          <li>
+            <strong>Configure services</strong>
+            <pre>Edit config.yml with your services to monitor</pre>
+          </li>
+          <li>
+            <strong>Enable GitHub Pages</strong>
+            <pre>Settings → Pages → Deploy from main branch</pre>
+          </li>
+          <li>
+            <strong>Done!</strong>
+            <pre>Your status page will be live at username.github.io/repo</pre>
+          </li>
+        </ol>
+      </div>
 
-checks:
-  - name: My Website
-    url: https://example.com
-  
-  - name: API
-    url: https://api.example.com/health
-    method: GET
-    expected: 200</code></pre>
-    </div>
+      <div class="example-config">
+        <h2>Configuration Example</h2>
+        <pre><code>language: en
+
+  checks:
+    - name: My Website
+      url: https://example.com
+    
+    - name: API
+      url: https://api.example.com/health
+      method: GET
+      expected: 200</code></pre>
+      </div>
     </main>
   `, 'src/global.css', 'src/main.js', 'en', version, config.report, lang.report);
   
