@@ -16,18 +16,9 @@ A lightweight, static status monitoring system for GitHub Pages. Monitor multipl
 - 📱 **Responsive Design** - Mobile-friendly minimal interface
 - 📈 **Historical Data** - 60-day history visualization on dashboard
 - ⚡ **Minimal CSS** - Clean, monospace design
-
-## Project Structure
-
-```
-config.yml            # ← Your services (only file you need to edit)
-index.js              # Monitoring logic
-manage-issues.js      # GitHub Issues automation
-yaml-parser.js        # Zero-dependency YAML parser
-global.css            # Minimal styling
-lang/                 # Translations
-.github/workflows/    # GitHub Actions
-```
+- 🔌 **Multi-Protocol** - HTTP/HTTPS, TCP ports, DNS resolution
+- 🛠️ **Maintenance Mode** - Mark services as under maintenance
+- 📋 **Copy to Clipboard** - One-click API endpoint copying
 
 ## Quick Start
 
@@ -40,22 +31,32 @@ cd status
 
 ### 2. Configure Services
 
-Edit `config.json`:
+Edit `config.yml`:
 
-```json
-{
-  "language": "en",
-  "services": [
-    {
-      "id": "my-service",
-      "name": "My Service",
-      "url": "https://example.com",
-      "method": "GET",
-      "expectedStatus": 200,
-      "timeout": 10000
-    }
-  ]
-}
+```yaml
+language: en
+
+checks:
+  - name: My Website
+    url: https://example.com
+  
+  - name: API (POST check)
+    url: https://api.example.com/status
+    method: POST
+    expected: 201
+  
+  - name: Database
+    type: tcp
+    host: db.example.com
+    port: 5432
+  
+  - name: DNS Check
+    type: dns
+    domain: example.com
+  
+  - name: Planned Maintenance
+    url: https://example.com/health
+    maintenance: Scheduled maintenance
 ```
 
 ### 3. Run Locally
@@ -100,19 +101,54 @@ This generates:
 
 One file: `config.yml`
 
-```yaml
-language: en  # "en" or "es"
-report: https://github.com/user/repo/issues/new  # Optional: "Report an issue" link
+### HTTP/HTTPS Services
 
+```yaml
 checks:
-  - name: My Service      # Display name
-    url: https://...      # URL to check
-  
+  - name: Website
+    url: https://example.com
+    method: GET              # Optional: GET, POST, HEAD (default: GET)
+    expected: 200            # Optional (default: 200)
+    timeout: 10000           # Optional in ms (default: 10000)
+```
+
+### TCP Port Monitoring
+
+```yaml
+checks:
+  - name: Database
+    type: tcp
+    host: db.example.com
+    port: 5432
+    timeout: 5000            # Optional in ms
+```
+
+### DNS Resolution
+
+```yaml
+checks:
+  - name: DNS Record
+    type: dns
+    domain: example.com
+    timeout: 5000            # Optional in ms
+```
+
+### Maintenance Mode
+
+Mark a service as under maintenance - won't trigger alerts:
+
+```yaml
+checks:
   - name: API
     url: https://api.example.com
-    method: POST          # Optional (default: GET)
-    expected: 201         # Optional (default: 200)
-    timeout: 5000         # Optional (default: 10000)
+    maintenance: "Planned maintenance until 2026-01-29"
+```
+
+### Global Settings
+
+```yaml
+language: en                                          # "en" or "es"
+report: https://github.com/user/repo/issues/new    # Optional: "Report" link
 ```
 
 **report examples:**
@@ -120,13 +156,7 @@ checks:
 - Email (auto-detected): `support@example.com` → becomes `mailto:support@example.com`
 - If not set, the link won't be displayed
 
-**Minimal defaults:**
-- `method`: GET
-- `expected`: 200
-- `timeout`: 10000ms
-- `id`: auto-generated from name
-
-**That's it.** One file. No other setup needed.
+**All IDs are auto-generated** from service names (kebab-case)
 
 ## Local Development
 
@@ -152,18 +182,14 @@ The system automatically creates GitHub Issues when services go down and closes 
 
 No additional configuration needed! Uses GitHub's built-in `GITHUB_TOKEN`.
 
+Services in **maintenance mode** don't trigger incident issues.
+
 **Customization:**  
-Edit `manage-issues.js` to modify yml`:
+Edit `manage-issues.js` to modify notification behavior or `lang/{code}.json` to add new languages.
 
-```yaml
-language: es  # English: "en", Spanish: "es"
-```json
-{
-  "language": "es"  // English: "en", Spanish: "es"
-}
-```
+### Copy to Clipboard
 
-Add more languages by creating `lang/{code}.json` files.
+API endpoints have a copy button for quick clipboard access. Click the clipboard icon to copy the full API URL.
 
 ### Check Frequency
 
@@ -215,16 +241,20 @@ This is simpler. One config file. Fork and go.
 ## Project Structure
 
 ```
-config.json           # ← Your services (only file you need to edit)
-index.js              # Monitoring logic
-manage-yml            # ← Your services (only file you need to edit)
-index.js              # Monitoring logic
+config.yml            # ← Your services (YAML format, main config)
+index.js              # Monitoring orchestrator
 manage-issues.js      # GitHub Issues automation
-yaml-parser.js        # Zero-dependency YAML parser
+lib/
+  checker.js          # URL/TCP/DNS checking logic
+  generators.js       # HTML and badge generation
+  utils.js            # Utility functions
+  yaml-parser.js      # Zero-dependency YAML parser
+  html.js             # HTML template generator
+lang/                 # Translation files
 .github/workflows/    # GitHub Actions
 ```
 
-Generated files (don't edit):
+Generated files (committed to git, don't edit directly):
 ```
 index.html            # Dashboard
 service/              # Detail pages
