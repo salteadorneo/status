@@ -4,6 +4,7 @@
   --link-color: #00e;
   --up-color: #0a0;
   --down-color: #d00;
+  --maintenance-color: #fa0;
   --border-color: #ddd;
   --card-bg: #fafafa;
 }
@@ -15,6 +16,7 @@
     --link-color: #6af;
     --up-color: #0f0;
     --down-color: #f44;
+    --maintenance-color: #fc6;
     --border-color: #444;
     --card-bg: #1a1a1a;
  }
@@ -246,6 +248,10 @@ a {
   color: var(--down-color);
 }
 
+.status-badge.maintenance {
+  color: var(--maintenance-color);
+}
+
 .metric-row {
   font-size: 0.85rem;
   opacity: 0.8;
@@ -257,6 +263,10 @@ a {
 
 .down {
   color: var(--down-color);
+}
+
+.maintenance {
+  color: var(--maintenance-color);
 }
 
 table {
@@ -296,6 +306,18 @@ details {
     background: var(--border-color);
 
     &.up {
+      background: var(--up-color);
+    }
+
+    &.down {
+      background: var(--down-color);
+    }
+
+    &.maintenance {
+      background: var(--maintenance-color);
+    }
+  }
+}
       background: var(--up-color);
     }
 

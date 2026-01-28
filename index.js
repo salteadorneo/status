@@ -75,7 +75,8 @@ if (fs.existsSync(yamlPath)) {
       url: check.url,
       method: check.method || 'GET',
       expectedStatus: check.expectedStatus || check.expected || 200,
-      timeout: check.timeout || 10000
+      timeout: check.timeout || 10000,
+      maintenance: check.maintenance || null
     }))
   };
 } else {
@@ -130,6 +131,7 @@ async function checkAllServices() {
   
   const up = results.filter(s => s.status === 'up').length;
   const down = results.filter(s => s.status === 'down').length;
+  const maintenance = results.filter(s => s.status === 'maintenance').length;
   const avgResponseTime = results.length > 0 ? Math.round(results.reduce((sum, s) => sum + s.responseTime, 0) / results.length) : 0;
   const totalServices = results.length;
   
@@ -151,8 +153,10 @@ async function checkAllServices() {
   
   const serviceCards = results.map(s => {
     const allHistory = getServiceHistory(s.id, __dirname);
-    const uptimeCount = allHistory.filter(h => h.status === 'up').length;
-    const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(1) : 100;
+    // Excluir mantenimiento del cálculo de uptime
+    const activeHistory = allHistory.filter(h => h.status !== 'maintenance');
+    const uptimeCount = activeHistory.filter(h => h.status === 'up').length;
+    const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(1) : 100;
     const trend = calculateTrend(allHistory, s.responseTime);
     const historyBar = generateHistoryBar(allHistory, '60d', locale);
     
@@ -223,9 +227,11 @@ async function checkAllServices() {
   config.services.forEach(service => {
     const allHistory = getServiceHistory(service.id, __dirname);
     
-    const uptimeCount = allHistory.filter(s => s.status === 'up').length;
-    const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(2) : 100;
-    const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
+    // Excluir mantenimiento del cálculo de uptime
+    const activeHistory = allHistory.filter(s => s.status !== 'maintenance');
+    const uptimeCount = activeHistory.filter(s => s.status === 'up').length;
+    const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(2) : 100;
+    const avgTime = activeHistory.length > 0 ? (activeHistory.reduce((sum, s) => sum + s.responseTime, 0) / activeHistory.length).toFixed(0) : 0;
     const incidentsCount = allHistory.filter(s => s.status === 'down').length;
     const lastIncident = allHistory.find(s => s.status === 'down');
     const lastIncidentText = lastIncident ? `${lang.lastIncident}: ${formatDate(lastIncident.timestamp, locale)}` : lang.noIncidents;

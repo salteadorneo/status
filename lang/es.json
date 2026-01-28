@@ -10,6 +10,7 @@
   "lastCheck": "Última comprobación",
   "up": "ACTIVO",
   "down": "CAÍDO",
+  "maintenance": "MANTENIMIENTO",
   "apiJsonData": "API / Datos JSON",
   "currentStatus": "Estado actual (JSON)",
   "monthlyHistory": "Historial por mes (JSON)",

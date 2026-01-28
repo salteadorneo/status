@@ -6,6 +6,7 @@ checks:
   
   - name: Example Service
     url: https://example.com/health
+    maintenance: Mantenimiento programado
   
   - name: Example POST Service
     url: https://example.com/api/status

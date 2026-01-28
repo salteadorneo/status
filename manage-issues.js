@@ -22,7 +22,8 @@ export async function manageIssues(github, context) {
       services: (parsed.checks || parsed.services || []).map((check) => ({
         id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         name: check.name,
-        url: check.url
+        url: check.url,
+        maintenance: check.maintenance || null
       }))
     };
   } else {
@@ -30,6 +31,12 @@ export async function manageIssues(github, context) {
   }
   
   for (const service of config.services) {
+    // No gestionar issues para servicios en modo mantenimiento
+    if (service.maintenance) {
+      console.log(`⚠️ ${service.name} is in maintenance mode, skipping issue management`);
+      continue;
+    }
+    
     const statusPath = path.join(__dirname, 'api', service.id, 'status.json');
     if (!fs.existsSync(statusPath)) continue;
     

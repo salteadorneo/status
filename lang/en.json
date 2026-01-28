@@ -10,6 +10,7 @@
   "lastCheck": "Last check",
   "up": "UP",
   "down": "DOWN",
+  "maintenance": "MAINTENANCE",
   "apiJsonData": "API / JSON Data",
   "currentStatus": "Current status (JSON)",
   "monthlyHistory": "Monthly history (JSON)",
