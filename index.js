@@ -104,6 +104,7 @@ function loadConfig() {
       report: parsed.report || null,
       logo: parsed.logo || null,
       title: parsed.title || null,
+      noindex: parsed.noindex || false,
       services: (parsed.checks || parsed.services || []).map(normalizeService)
     };
   }
@@ -334,7 +335,9 @@ async function checkAllServices() {
   
   const reportLink = generateReportLink(config.report, lang.report);
   
-  const indexHTML = generateHTML(config.title || lang.title, `
+  const indexHTML = generateHTML({
+    title: config.title || lang.title,
+    body: `
     <header>
       <h1 class="title">${generateTitle(IS_TEMPLATE ? '../index.html' : 'index.html')}</h1>
       ${reportLink ? `<nav>${reportLink}</nav>` : ''}
@@ -372,7 +375,15 @@ async function checkAllServices() {
         ${serviceCards}
       </div>
     </main>
-  `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, version, config.report, lang.report, IS_TEMPLATE ? lang.demoBannerIndex : null);
+  `, 
+    cssPath: IS_TEMPLATE ? '../src/global.css' : 'src/global.css',
+    scriptPath: IS_TEMPLATE ? '../src/main.js' : 'src/main.js',
+    language: config.language,
+    version,
+    report: config.report,
+    reportText: lang.report,
+    noindex: config.noindex
+  });
   
   const baseDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
   if (IS_TEMPLATE && !fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
@@ -429,7 +440,9 @@ function generateServicePages(results, now) {
     
     const reportLink = generateReportLink(config.report, lang.report);
     
-    const serviceHTML = generateHTML(`${service.name} - ${lang.status}`, `
+    const serviceHTML = generateHTML({
+      title: `${service.name} - ${lang.status}`,
+      body: `
       <header>
         <h1 class="title">${generateTitle('../index.html')}</h1>
         ${reportLink ? `<nav>${reportLink}</nav>` : ''}
@@ -540,7 +553,15 @@ function generateServicePages(results, now) {
           </div>
         </details>
       </main>
-    `, paths.css, paths.script, config.language, version, config.report, lang.report, IS_TEMPLATE ? lang.demoBanner : null);
+    `, 
+      cssPath: paths.css,
+      scriptPath: paths.script,
+      language: config.language,
+      version,
+      report: config.report,
+      reportText: lang.report,
+      noindex: config.noindex
+    });
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
@@ -553,7 +574,9 @@ function generateServicePages(results, now) {
 function generateLandingPage() {
   console.log('\n📄 Generating landing page (template mode)...');
   
-  const landingHTML = generateHTML('Status - Zero-dependency GitHub Pages uptime monitoring', `
+  const landingHTML = generateHTML({
+    title: 'Status - Zero-dependency GitHub Pages uptime monitoring',
+    body: `
     <main>
       <div class="landing-hero">
         <h1 class="landing-title">📊 Status</h1>
@@ -630,7 +653,15 @@ function generateLandingPage() {
       expected: 200</code></pre>
       </div>
     </main>
-  `, 'src/global.css', 'src/main.js', 'en', version, config.report, lang.report);
+  `,
+    cssPath: 'src/global.css',
+    scriptPath: 'src/main.js',
+    language: 'en',
+    version,
+    report: config.report,
+    reportText: lang.report,
+    noindex: config.noindex
+  });
   
   fs.writeFileSync(path.join(__dirname, 'index.html'), landingHTML);
   console.log('Generated landing at /index.html');
