@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parseYAML } from './yaml-parser.js';
+import { parseYAML } from './lib/yaml-parser.js';
+import { generateHistoryBar, generateBadge, generateSparkline } from './lib/generators.js';
+import { formatDate, calculateTrend, getServiceHistory } from './lib/utils.js';
+import { checkUrl } from './lib/checker.js';
+import { generateHTML } from './lib/html.js';
 
 /**
  * @typedef {Object} Service
@@ -82,258 +86,6 @@ const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'ut
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
 
-const formatDate = date => new Date(date).toLocaleString(locale, {
-  year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-});
-
-const generateHistoryBar = (history, period = '60d') => {
-  let units, groupBy;
-  if (period === '24h') {
-    units = 24;
-    groupBy = 'hour';
-  } else if (period === '30d') {
-    units = 30;
-    groupBy = 'day';
-  } else {
-    units = 60;
-    groupBy = 'day';
-  }
-  
-  const now = new Date();
-  const historyMap = new Map();
-  
-  history.forEach(entry => {
-    let key;
-    const entryDate = new Date(entry.timestamp);
-    if (groupBy === 'hour') {
-      const dateStr = entryDate.toISOString().split('.')[0].substring(0, 13); // YYYY-MM-DDTHH
-      key = dateStr;
-    } else {
-      key = entryDate.toISOString().split('T')[0];
-    }
-    if (!historyMap.has(key)) historyMap.set(key, []);
-    historyMap.get(key).push(entry);
-  });
-  
-  const bars = [];
-  for (let i = units - 1; i >= 0; i--) {
-    let key, title;
-    if (groupBy === 'hour') {
-      const date = new Date(now);
-      date.setHours(date.getHours() - i);
-      key = date.toISOString().split('.')[0].substring(0, 13);
-      const displayTime = date.toLocaleString(locale, { hour: '2-digit', minute: '2-digit' });
-      title = displayTime;
-    } else {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      key = date.toISOString().split('T')[0];
-      title = key;
-    }
-    
-    const periodData = historyMap.get(key);
-    
-    let status = '';
-    if (periodData) {
-      const upCount = periodData.filter(d => d.status === 'up').length;
-      const uptime = (upCount / periodData.length * 100).toFixed(0);
-      status = uptime >= 95 ? 'up' : 'down';
-      title = `${title}: ${uptime}% uptime (${periodData.length} checks)`;
-    }
-    
-    bars.push(`<div class="history-day ${status}" title="${title}"></div>`);
-  }
-  
-  return `<div class="history" data-period="${period}">${bars.join('')}</div>`;
-};
-
-function generateBadge(label, message, status) {
-  const color = status === 'up' ? '#0a0' : '#d00';
-  const darkColor = status === 'up' ? '#0f0' : '#f44';
-  const labelWidth = label.length * 6 + 10;
-  const messageWidth = message.length * 6 + 10;
-  const totalWidth = labelWidth + messageWidth;
-  
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="${label}: ${message}">
-  <title>${label}: ${message}</title>
-  <style>
-    text { font: 11px monospace; fill: #fff; }
-    @media (prefers-color-scheme: dark) {
-      rect.status { fill: ${darkColor}; }
-    }
-  </style>
-  <rect width="${labelWidth}" height="20" fill="#555"/>
-  <rect class="status" x="${labelWidth}" width="${messageWidth}" height="20" fill="${color}"/>
-  <text x="${labelWidth / 2}" y="14" text-anchor="middle">${label}</text>
-  <text x="${labelWidth + messageWidth / 2}" y="14" text-anchor="middle">${message}</text>
-</svg>`;
-}
-
-function calculateTrend(history, currentTime) {
-  if (!history || history.length < 5) return '→';
-  const recentChecks = history.filter(h => h.status === 'up').slice(-10);
-  if (recentChecks.length < 5) return '→';
-  const avgRecent = recentChecks.reduce((sum, h) => sum + h.responseTime, 0) / recentChecks.length;
-  const diff = currentTime - avgRecent;
-  const threshold = avgRecent * 0.15;
-  if (diff > threshold) return '↑';
-  if (diff < -threshold) return '↓';
-  return '→';
-}
-
-function generateSparkline(history, width = 900, height = 200) {
-  if (!history || history.length < 2) return '';
-  const data = history.filter(h => h.status === 'up').slice(-50).map(h => h.responseTime);
-  if (data.length < 2) return '';
-  
-  const max = Math.max(...data);
-  const maxRounded = Math.ceil(max / 100) * 100;
-  const paddingLeft = 50;
-  const paddingRight = 20;
-  const paddingTop = 20;
-  const paddingBottom = 30;
-  const chartWidth = width - paddingLeft - paddingRight;
-  const chartHeight = height - paddingTop - paddingBottom;
-  const step = chartWidth / (data.length - 1);
-  
-  const points = data.map((val, i) => {
-    const x = paddingLeft + i * step;
-    const y = paddingTop + chartHeight - (val / maxRounded) * chartHeight;
-    return { x, y, val };
-  });
-  
-  let pathData = `M${points[0].x},${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(i - 1, 0)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(i + 2, points.length - 1)];
-    
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    
-    pathData += ` C${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
-  }
-  
-  const circles = points.map(p => 
-    `<circle cx="${p.x}" cy="${p.y}" r="3" fill="currentColor" opacity="0.7"><title>${p.val}ms</title></circle>`
-  ).join('');
-  
-  const yTicks = [];
-  for (let i = 0; i <= maxRounded; i += 100) {
-    const y = paddingTop + chartHeight - (i / maxRounded) * chartHeight;
-    yTicks.push(`<line x1="${paddingLeft - 5}" y1="${y}" x2="${paddingLeft}" y2="${y}" stroke="currentColor" opacity="0.3" stroke-width="1"/>`);
-    yTicks.push(`<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="currentColor" opacity="0.1" stroke-width="1" stroke-dasharray="2,2"/>`);
-    yTicks.push(`<text x="${paddingLeft - 8}" y="${y + 3}" font-size="10" fill="currentColor" opacity="0.6" text-anchor="end">${i}</text>`);
-  }
-  
-  const axisY = `<line x1="${paddingLeft}" y1="${paddingTop}" x2="${paddingLeft}" y2="${height - paddingBottom}" stroke="currentColor" opacity="0.3" stroke-width="1"/>`;
-  const axisX = `<line x1="${paddingLeft}" y1="${height - paddingBottom}" x2="${width - paddingRight}" y2="${height - paddingBottom}" stroke="currentColor" opacity="0.3" stroke-width="1"/>`;
-  
-  return `<svg width="${width}" height="${height}" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
-  ${yTicks.join('')}
-  ${axisX}
-  ${axisY}
-  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="${pathData}"/>
-  ${circles}
-</svg>`;
-}
-
-const html = (title, body, cssPath = 'global.css', includeScript = false) => `<!DOCTYPE html>
-<html lang="${config.language || 'en'}">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title}</title>
-<link rel="stylesheet" href="${cssPath}" />
-</head>
-<body>
-${body}
-<footer>
-  <a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-    salteadorneo/status
-  </a>
-  <span>v${pkg.version}</span>
-</footer>
-${includeScript ? `<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const historyContainers = document.querySelectorAll('.history-container > div');
-  
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const period = btn.dataset.period;
-      
-      filterBtns.forEach(b => {
-        const isActive = b.dataset.period === period;
-        b.classList.toggle('active', isActive);
-        b.setAttribute('aria-pressed', isActive);
-      });
-      
-      historyContainers.forEach((container, index) => {
-        const shouldShow = (period === '60d' && index === 0) || 
-                          (period === '30d' && index === 1) || 
-                          (period === '24h' && index === 2);
-        container.style.display = shouldShow ? 'block' : 'none';
-      });
-    });
-  });
-});
-</script>` : ''}
-</body>
-</html>`;
-
-const getServiceHistory = (serviceId) => {
-  const historyDir = path.join(__dirname, 'api', serviceId, 'history');
-  if (!fs.existsSync(historyDir)) return [];
-  const files = fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse();
-  return files.flatMap(f => JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf-8')));
-};
-
-async function checkUrl(service, attempt = 1) {
-  const start = Date.now();
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), service.timeout);
-    const response = await fetch(service.url, {
-      method: service.method || 'GET',
-      signal: controller.signal,
-      headers: { 'User-Agent': 'Status-Monitor/1.0' }
-    });
-    clearTimeout(timeout);
-    
-    return {
-      id: service.id,
-      name: service.name,
-      url: service.url,
-      status: response.status === service.expectedStatus ? 'up' : 'down',
-      statusCode: response.status,
-      responseTime: Date.now() - start,
-      timestamp: new Date().toISOString(),
-      error: null
-    };
-  } catch (error) {
-    if (attempt < RETRIES) {
-      console.log(`Retry ${attempt}/${RETRIES} for ${service.name} after ${RETRY_DELAY}ms...`);
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-      return checkUrl(service, attempt + 1);
-    }
-    return {
-      id: service.id,
-      name: service.name,
-      url: service.url,
-      status: 'down',
-      statusCode: null,
-      responseTime: Date.now() - start,
-      timestamp: new Date().toISOString(),
-      error: error.message
-    };
-  }
-}
-
 async function checkAllServices() {
   console.log('Starting status checks...');
   
@@ -382,11 +134,11 @@ async function checkAllServices() {
   const totalServices = results.length;
   
   const serviceCards = results.map(s => {
-    const allHistory = getServiceHistory(s.id);
+    const allHistory = getServiceHistory(s.id, __dirname);
     const uptimeCount = allHistory.filter(h => h.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(1) : 100;
     const trend = calculateTrend(allHistory, s.responseTime);
-    const historyBar = generateHistoryBar(allHistory);
+    const historyBar = generateHistoryBar(allHistory, '60d', locale);
     
     return `
     <a href="service/${s.id}.html" class="service-card">
@@ -411,7 +163,7 @@ async function checkAllServices() {
     </a>`;
   }).join('');
   
-  const indexHTML = html(lang.statusMonitor, `
+  const indexHTML = generateHTML(lang.statusMonitor, `
     <h1>${lang.statusMonitor}</h1>
     <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
     
@@ -449,29 +201,29 @@ async function checkAllServices() {
   if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
   config.services.forEach(service => {
-    const allHistory = getServiceHistory(service.id);
+    const allHistory = getServiceHistory(service.id, __dirname);
     
     const uptimeCount = allHistory.filter(s => s.status === 'up').length;
     const uptime = allHistory.length > 0 ? (uptimeCount / allHistory.length * 100).toFixed(2) : 100;
     const avgTime = allHistory.length > 0 ? (allHistory.reduce((sum, s) => sum + s.responseTime, 0) / allHistory.length).toFixed(0) : 0;
     const incidentsCount = allHistory.filter(s => s.status === 'down').length;
     const lastIncident = allHistory.find(s => s.status === 'down');
-    const lastIncidentText = lastIncident ? `${lang.lastIncident}: ${formatDate(lastIncident.timestamp)}` : lang.noIncidents;
+    const lastIncidentText = lastIncident ? `${lang.lastIncident}: ${formatDate(lastIncident.timestamp, locale)}` : lang.noIncidents;
     const current = results.find(s => s.id === service.id);
     const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
-    const historyBar60d = generateHistoryBar(allHistory, '60d');
-    const historyBar30d = generateHistoryBar(allHistory, '30d');
-    const historyBar24h = generateHistoryBar(allHistory, '24h');
+    const historyBar60d = generateHistoryBar(allHistory, '60d', locale);
+    const historyBar30d = generateHistoryBar(allHistory, '30d', locale);
+    const historyBar24h = generateHistoryBar(allHistory, '24h', locale);
     const sparkline = generateSparkline(allHistory);
     
     const checksRows = allHistory.slice(-100).reverse().map(c => {
       const errorText = c.statusCode ? `HTTP ${c.statusCode}${c.error ? ': ' + c.error : ''}` : (c.error || '-');
-      return `<tr><td>${formatDate(c.timestamp)}</td><td class="${c.status}">●</td><td>${c.responseTime}ms</td><td>${errorText}</td></tr>`;
+      return `<tr><td>${formatDate(c.timestamp, locale)}</td><td class="${c.status}">●</td><td>${c.responseTime}ms</td><td>${errorText}</td></tr>`;
     }).join('');
     
-    const serviceHTML = html(`${service.name} - ${lang.status}`, `
+    const serviceHTML = generateHTML(`${service.name} - ${lang.status}`, `
       <h1>${lang.statusMonitor}</h1>
-      <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
+      <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString(), locale)}</p>
       
       <p><a href="../index.html">← ${lang.backToDashboard}</a></p>
       
@@ -506,7 +258,7 @@ async function checkAllServices() {
         
         <div class="service-stat">
           <div class="label">${lang.lastVerification}</div>
-          <div class="value" style="font-size: 0.75rem;">${formatDate(current.timestamp)}</div>
+          <div class="value" style="font-size: 0.75rem;">${formatDate(current.timestamp, locale)}</div>
         </div>
       </div>
       
