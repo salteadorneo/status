@@ -60,10 +60,15 @@ const RETRIES = 3;
 const RETRY_DELAY = 2000;
 
 /**
- * Read .env file and parse IS_TEMPLATE variable
- * @returns {boolean} True if IS_TEMPLATE=true in .env
+ * Read IS_TEMPLATE from environment variable or .env file
+ * @returns {boolean} True if IS_TEMPLATE=true
  */
 function isTemplateMode() {
+  if (process.env.IS_TEMPLATE !== undefined) {
+    const value = process.env.IS_TEMPLATE.toLowerCase();
+    return value === 'true' || value === '1';
+  }
+
   const envPath = path.join(__dirname, '.env');
   if (!fs.existsSync(envPath)) return false;
   

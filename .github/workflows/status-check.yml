@@ -38,6 +38,8 @@ jobs:
           node-version: '20'
       
       - name: Run checks & generate HTML
+        env:
+          IS_TEMPLATE: ${{ secrets.IS_TEMPLATE }}
         run: node index.js
       
       - name: Check for service incidents
