@@ -1,0 +1,51 @@
+[
+  {
+    "timestamp": "2026-01-28T17:17:14.033Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 53,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T17:35:35.945Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 38,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T17:52:16.858Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 64,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:13:06.787Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 60,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:33:48.735Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 60,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:54:30.468Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 46,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:11:15.291Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 98,
+    "error": null
+  }
+]

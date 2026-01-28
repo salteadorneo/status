@@ -1,0 +1,51 @@
+[
+  {
+    "timestamp": "2026-01-28T17:17:14.033Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 188,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T17:35:35.945Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 183,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T17:52:16.858Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 247,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:13:06.787Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 279,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:33:48.735Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 112,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:54:30.468Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 249,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:11:15.291Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 165,
+    "error": null
+  }
+]

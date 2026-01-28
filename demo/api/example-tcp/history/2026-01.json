@@ -1,0 +1,51 @@
+[
+  {
+    "timestamp": "2026-01-28T17:17:14.033Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 52,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
+  },
+  {
+    "timestamp": "2026-01-28T17:35:35.945Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 22,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
+  },
+  {
+    "timestamp": "2026-01-28T17:52:16.858Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 18,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
+  },
+  {
+    "timestamp": "2026-01-28T18:13:06.787Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 21,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
+  },
+  {
+    "timestamp": "2026-01-28T18:33:48.735Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 65,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
+  },
+  {
+    "timestamp": "2026-01-28T18:54:30.468Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 33,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
+  },
+  {
+    "timestamp": "2026-01-28T19:11:15.291Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 45,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "timestamp": "2026-01-28T17:17:14.033Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 1,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T17:35:35.945Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 4,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T17:52:16.858Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 2,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:13:06.787Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 2,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:33:48.735Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 19,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T18:54:30.468Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 2,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:11:15.291Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 6,
+    "error": null
+  }
+]
