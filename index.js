@@ -84,6 +84,9 @@ const IS_TEMPLATE = isTemplateMode();
 
 const dataDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
 
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
+const VERSION = packageJson.version;
+
 /** @type {Config} */
 let config;
 const yamlPath = path.join(__dirname, 'config.yml');
@@ -263,7 +266,7 @@ async function checkAllServices() {
     <div class="services-grid">
       ${serviceCards}
     </div>
-  `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, '1.0.0', config.report, lang.report);
+  `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, VERSION, config.report, lang.report);
   
   const baseDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
   if (IS_TEMPLATE && !fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
@@ -388,7 +391,7 @@ async function checkAllServices() {
         <pre>![${service.name}](https://YOUR_USERNAME.github.io/YOUR_REPO${badgeAbsPath}/${service.id}.svg)</pre>
         <p><img src="${badgePath}/${service.id}.svg" alt="${service.name} status"></p>
       </details>
-    `, cssPath, scriptPath, config.language, '1.0.0', config.report, lang.report);
+    `, cssPath, scriptPath, config.language, VERSION, config.report, lang.report);
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
@@ -480,7 +483,7 @@ checks:
     method: GET
     expected: 200</code></pre>
     </div>
-  `, 'src/global.css', 'src/main.js', 'en', '1.0.0', config.report, lang.report);
+  `, 'src/global.css', 'src/main.js', 'en', VERSION, config.report, lang.report);
   
   fs.writeFileSync(path.join(__dirname, 'index.html'), landingHTML);
   console.log('Generated landing at /index.html');
