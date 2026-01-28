@@ -18,22 +18,13 @@ A lightweight, static status monitoring system for GitHub Pages. Monitor multipl
 ## Project Structure
 
 ```
-├── index.js              # Main script (checks + HTML generation)
-├── manage-issues.js      # GitHub Issues automation
-├── config.json           # Service configuration
-├── index.html            # Generated dashboard
-├── service/              # Generated service detail pages
-├── api/                  # Generated JSON endpoints
-│   └── {service-id}/
-│       ├── status.json   # Current status
-│       └── history/
-│           └── YYYY-MM.json  # Monthly history
-├── badge/                # Generated status badges
-├── lang/
-│   ├── en.json           # English translations
-│   └── es.json           # Spanish translations
-└── .github/workflows/
-    └── status-check.yml  # Automated checks workflow
+config.yml            # ← Your services (only file you need to edit)
+index.js              # Monitoring logic
+manage-issues.js      # GitHub Issues automation
+yaml-parser.js        # Zero-dependency YAML parser
+global.css            # Minimal styling
+lang/                 # Translations
+.github/workflows/    # GitHub Actions
 ```
 
 ## Quick Start
@@ -77,227 +68,183 @@ This generates:
 - `api/{id}/status.json` - Current status endpoints
 - `api/{id}/history/YYYY-MM.json` - Historical data
 
-### 4. Deploy to GitHub Pages
+### 4. (Optional) Custom domain
 
-1. Enable GitHub Pages in repository Settings → Pages
-2. Select source: **GitHub Actions**
-3. Push to main branch
-4. The workflow will automatically run every 10 minutes
+1. Add your subdomain in **Settings** → **Pages** → **Custom domain**
+2. Point your DNS: `status.yourdomain.com` → GitHub Pages
+3. That's it!
 
-## Incident Notifications
+## What You Get
 
-The system automatically creates GitHub Issues when services go down and closes them when services recover.
+- **Live dashboard** - Clean, minimal interface showing all services
+- **Auto-checks** - Every 10 minutes via GitHub Actions
+- **60-day history** - Visual timeline on each service
+- **Incident alerts** - GitHub Issues created/closed automatically
+- **JSON API** - `/api/{service}/status.json` for your own tools
+- **Status badges** - Embeddable SVG badges
 
-### How it works
+## How It Works
 
-1. **Service goes down** (status changes from `up` to `down`):
-   - Automatically creates a GitHub Issue with label `incident`
-   - Issue title: `🔴 [Service Name] is down`
-   - Includes: URL, error details, timestamp, status code, response time
-   - GitHub sends email notification to repository owner
+1. **GitHub Actions** runs `index.js` every 10 minutes
+2. Checks each service URL and saves results
+3. Generates static HTML pages and JSON endpoints
+4. If a service goes down → creates a GitHub Issue (email notification)
+5. When it recovers → closes the issue automatically
+6. Deploys everything to GitHub Pages
 
-2. **Service recovers** (status changes from `down` to `up`):
-   - Adds a comment to the existing issue with recovery details
-   - Automatically closes the issue
-   - GitHub sends email notification about the closure
-
-### Configuration
-
-No additional configuration needed! The workflow uses GitHub's built-in `GITHUB_TOKEN` with `issues: write` permission.
-
-**Notification recipients:**
-- Repository owner (automatic)
-- Watchers of the repository
-- Anyone subscribed to the specific issue
-
-**Customization:**
-Edit `manage-issues.js` to modify issue templates, labels, or behavior.
+**No servers. No databases. No external services.**
 
 ## Configuration
 
-### Service Configuration (`config.json`)
+One file: `config.yml`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `language` | string | UI language: `en` or `es` |
-| `services` | array | List of services to monitor |
-| `id` | string | Unique service identifier (used in URLs) |
-| `name` | string | Display name |
-| `url` | string | URL to check |
-| `method` | string | HTTP method (`GET`, `POST`, etc.) |
-| `expectedStatus` | number | Expected HTTP status code |
-| `timeout` | number | Request timeout in milliseconds |
-
-### Language Support
-
-Change the UI language by editing `config.json`:
-
-```json
-{
-  "language": "es"  // or "en"
-}
-```
-
-Add new languages by creating `lang/{code}.json` based on existing files.
-
-## API Endpoints
-
-All endpoints return JSON data:
-
-### Current Status
-```
-GET /api/{service-id}/status.json
-```
-
-### Historical Data
-```
-GET /api/{service-id}/history/YYYY-MM.json
-```
-
-## Workflow Configuration
-
-The GitHub Actions workflow (`.github/workflows/status-check.yml`) runs automatically every 10 minutes.
-
-**Manual trigger:**
-```bash
-# Go to Actions tab → Status Check & Deploy → Run workflow
-```
-
-**Customization:**
-
-Change check frequency by editing the cron schedule:
 ```yaml
-on:
-  schedule:
-    - cron: '*/10 * * * *'  # Every 10 minutes
+language: en  # "en" or "es"
+
+checks:
+  - name: My Service      # Display name
+    url: https://...      # URL to check
+  
+  - name: API
+    url: https://api.example.com
+    method: POST          # Optional (default: GET)
+    expected: 201         # Optional (default: 200)
+    timeout: 5000         # Optional (default: 10000)
 ```
 
-## Development
+**Minimal defaults:**
+- `method`: GET
+- `expected`: 200
+- `timeout`: 10000ms
+- `id`: auto-generated from name
 
-### Local Testing
+**That's it.** One file. No other setup needed.
+
+## Local Development
+
+Want to test locally before pushing?
 
 ```bash
-npm run build
+node index.js
 ```
 
-### Running Tests
+Open `index.html` in your browser. That's your status page.
 
-The project includes basic tests using Node.js native test runner:
-
-```bash
-npm test              # Run tests once
-npm run test:watch    # Run tests in watch mode
-```
-
-TestDashboard visualization:** Last 60 days displayed on each service card
-- **Service detail pages:** Full historical data and graphs
-- **Automatic cleanup:** Old entries removed when limit reached
-
-## Dashboard
-
-The dashboard displays:
-- **Summary cards**: Operational services, issues, and average response time
-- **Service cards**: Each showing:
-  - Service name wi with clean card-based layout
-- Monospace typography for a minimal aesthetic
-- Status indicators with colored dots (● green/red)
-- 60-day history bars on each service card
-
-### HTML Templates
-
-Modify the generation logic in `index.js` to customize page structure.
+## Advanced
 
 ### Incident Notifications
 
-Customize issue creation and closure in `manage-issues.js`:
-- Modify issue title format
-- Change issue body template
-- Add custom labels
-- Adjust notification logic
-- Trend calculation
-- File structure verification
+The system automatically creates GitHub Issues when services go down and closes them when services recover.
 
-### Adding Services
+**How it works:**
 
-1. Add service to `config.json`
-2. Run `npm run build`
-3. Commit and push changes
+1. **Service goes down** → Creates GitHub Issue with label `incident`
+2. **Service recovers** → Adds comment and closes the issue automatically
+3. **You get email** → GitHub notifies repository owner on both events
 
-### Retry Logic
+No additional configuration needed! Uses GitHub's built-in `GITHUB_TOKEN`.
 
-Default configuration:
-- **Retries:** 3 attempts
-- **Retry delay:** 1000ms between attempts
+**Customization:**  
+Edit `manage-issues.js` to modify yml`:
 
-Edit in `index.js`:
-```javascript
-const RETRIES = 3;
-const RETRY_DELAY = 1000;
+```yaml
+language: es  # English: "en", Spanish: "es"
+```json
+{
+  "language": "es"  // English: "en", Spanish: "es"
+}
 ```
 
-## Data Storage
+Add more languages by creating `lang/{code}.json` files.
 
-- **Status checks:** Stored per service in `api/{id}/status.json`
-- **History:** Monthly files with max 4,320 entries (~30 days at 10-minute intervals)
-- **Historical visualization:** Last 60 days displayed on service pages
-- **Automatic cleanup:** Old entries removed when limit reached
+### Check Frequency
 
-## Customization
+Edit `.github/workflows/status-check.yml`:
 
-### Styling
-
-Edit `global.css` for custom styling. The default theme includes:
-- Dark mode support via `@media (prefers-color-scheme: dark)`
-- Responsive design
-- Monospace typography
-- Minimal footprint
-
-### HTML Templates
-
-Modify the `html()` function and generation logic in `index.js` to customize page structure.
+```yaml
+schedule:
+  - cron: '*/10 * * * *'  # Every 10 minutes
+  - cron: '*/5 * * * *'   # Every 5 minutes
+  - cron: '0 * * * *'     # Every hour
+```
 
 ### Status Badges
 
-Each service has an auto-generated SVG badge available at:
-```
-/badge/{service-id}.svg
-```
+Embed in your README or docs:
 
-Embed in external pages:
 ```markdown
-![Service Status](https://your-username.github.io/status/badge/service-id.svg)
+![API Status](https://yourusername.github.io/status/badge/api.svg)
 ```
 
-## GitHub Pages Setup
+### JSON API
 
-1. **Repository Settings** → **Pages**
-2. **Source:** GitHub Actions
-3. **Custom domain** (optional): Configure in Settings
+```bash
+# Current status
+GET /api/{service-id}/status.json
 
-The workflow automatically deploys after each successful check.
+# Monthly history
+GET /api/{service-id}/history/2026-01.json
+```
 
-## Troubleshooting
+## Use Cases
 
-### Workflow not running
-- Check Actions tab for errors
-- Verify cron schedule syntax
-- Ensure GitHub Actions is enabled
+- 🧑‍💻 **Side projects** - Show uptime to users
+- 🏗️ **Indie SaaS** - Transparent status without paying $99/mo
+- 🧪 **Labs/experiments** - Monitor dev/staging environments
+- 🏠 **Homelab** - Track your self-hosted services
+- 📦 **Open source** - Public status for your project's API
+- 🤖 **Bots/automation** - Check if your workers are alive
 
-### 404 on GitHub Pages
-- Confirm Pages is enabled with GitHub Actions source
-- Wait 1-2 minutes after first deployment
-- Check deployment status in Actions tab
+## Why Not Upptime?
 
-### Services showing as down
-- Verify URL is accessible
-- Check timeout setting (increase if needed)
-- Review expectedStatus code
-- Check service logs in Actions tab
+Upptime is great, but:
+- More complex setup
+- More opinionated structure
+- Harder to customize
+
+This is simpler. One config file. Fork and go.
+
+## Project Structure
+
+```
+config.json           # ← Your services (only file you need to edit)
+index.js              # Monitoring logic
+manage-yml            # ← Your services (only file you need to edit)
+index.js              # Monitoring logic
+manage-issues.js      # GitHub Issues automation
+yaml-parser.js        # Zero-dependency YAML parser
+.github/workflows/    # GitHub Actions
+```
+
+Generated files (don't edit):
+```
+index.html            # Dashboard
+service/              # Detail pages
+api/                  # JSON endpoints
+badge/                # SVG badges
+```
+
+## FAQ
+
+**Q: How much does this cost?**  
+A: $0. GitHub Actions free tier: 2,000 minutes/month. Checking 7 services every 10 minutes uses ~150 minutes/month.
+
+**Q: Can I monitor internal/private services?**  
+A: Yes, if they're accessible from GitHub's runners (public IPs or VPN).
+
+**Q: What happens if GitHub Actions goes down?**  
+A: Your status page (already deployed) stays up. Checks pause until Actions recovers.
+
+**Q: Can I customize the design?**  
+A: Yes! Edit `global.css` and the HTML generation in `index.js`.
+
+**Q: How do I get email alerts?**  
+A: GitHub automatically emails you when issues are created/closed. No setup needed.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Pull requests welcome! This is meant to stay simple, but improvements are always appreciated.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT - Fork it, use it, modify it.

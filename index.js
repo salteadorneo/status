@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { parseYAML } from './yaml-parser.js';
 
 /**
  * @typedef {Object} Service
@@ -52,12 +53,33 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const RETRIES = 3;
-const RETRY_DELAY = 1000;
+const RETRY_DELAY = 2000;
 
 const GITHUB_ICON = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`;
 
 /** @type {Config} */
-const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf-8'));
+let config;
+const yamlPath = path.join(__dirname, 'config.yml');
+const jsonPath = path.join(__dirname, 'config.json');
+
+if (fs.existsSync(yamlPath)) {
+  const yamlContent = fs.readFileSync(yamlPath, 'utf-8');
+  const parsed = parseYAML(yamlContent);
+  config = {
+    language: parsed.language || 'en',
+    services: (parsed.checks || parsed.services || []).map((check, index) => ({
+      id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      name: check.name,
+      url: check.url,
+      method: check.method || 'GET',
+      expectedStatus: check.expectedStatus || check.expected || 200,
+      timeout: check.timeout || 10000
+    }))
+  };
+} else {
+  config = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+}
+
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
@@ -256,7 +278,7 @@ async function checkUrl(service, attempt = 1) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), service.timeout);
     const response = await fetch(service.url, {
-      method: service.method,
+      method: service.method || 'GET',
       signal: controller.signal,
       headers: { 'User-Agent': 'Status-Monitor/1.0' }
     });

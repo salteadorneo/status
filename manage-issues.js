@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { parseYAML } from './yaml-parser.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,7 +11,23 @@ const __dirname = path.dirname(__filename);
  * To be run by GitHub Actions with github-script
  */
 export async function manageIssues(github, context) {
-  const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf-8'));
+  let config;
+  const yamlPath = path.join(__dirname, 'config.yml');
+  const jsonPath = path.join(__dirname, 'config.json');
+  
+  if (fs.existsSync(yamlPath)) {
+    const yamlContent = fs.readFileSync(yamlPath, 'utf-8');
+    const parsed = parseYAML(yamlContent);
+    config = {
+      services: (parsed.checks || parsed.services || []).map((check) => ({
+        id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name: check.name,
+        url: check.url
+      }))
+    };
+  } else {
+    config = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+  }
   
   for (const service of config.services) {
     const statusPath = path.join(__dirname, 'api', service.id, 'status.json');
