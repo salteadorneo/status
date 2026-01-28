@@ -86,67 +86,70 @@ function isTemplateMode() {
 }
 
 const IS_TEMPLATE = isTemplateMode();
-
 const dataDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
+const { version } = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
 
-const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
-const VERSION = packageJson.version;
-
-/** @type {Config} */
-let config;
-const yamlPath = path.join(__dirname, 'config.yml');
-const jsonPath = path.join(__dirname, 'config.json');
-
-if (fs.existsSync(yamlPath)) {
-  const yamlContent = fs.readFileSync(yamlPath, 'utf-8');
-  const parsed = parseYAML(yamlContent);
-  config = {
-    language: parsed.language || 'en',
-    report: parsed.report || null,
-    services: (parsed.checks || parsed.services || []).map((check, index) => {
-      const baseConfig = {
-        id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        name: check.name,
-        type: check.type || 'http',
-        timeout: check.timeout || 10000,
-        maintenance: check.maintenance || null
-      };
-      
-      if (check.type === 'tcp') {
-        return {
-          ...baseConfig,
-          host: check.host,
-          port: check.port
-        };
-      } else if (check.type === 'dns') {
-        return {
-          ...baseConfig,
-          domain: check.domain
-        };
-      } else {
-        return {
-          ...baseConfig,
-          url: check.url,
-          method: check.method || 'GET',
-          expectedStatus: check.expectedStatus || check.expected || 200
-        };
-      }
-    })
-  };
-} else {
-  config = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+/**
+ * Load and parse configuration from YAML or JSON
+ * @returns {Config}
+ */
+function loadConfig() {
+  const yamlPath = path.join(__dirname, 'config.yml');
+  const jsonPath = path.join(__dirname, 'config.json');
+  
+  if (fs.existsSync(yamlPath)) {
+    const parsed = parseYAML(fs.readFileSync(yamlPath, 'utf-8'));
+    return {
+      language: parsed.language || 'en',
+      report: parsed.report || null,
+      services: (parsed.checks || parsed.services || []).map(normalizeService)
+    };
+  }
+  
+  return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
 }
 
+/**
+ * Normalize service configuration
+ * @param {Object} check - Raw service check configuration
+ * @returns {Service}
+ */
+function normalizeService(check) {
+  const baseConfig = {
+    id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    name: check.name,
+    type: check.type || 'http',
+    timeout: check.timeout || 10000,
+    maintenance: check.maintenance || null
+  };
+  
+  if (check.type === 'tcp') {
+    return { ...baseConfig, host: check.host, port: check.port };
+  }
+  
+  if (check.type === 'dns') {
+    return { ...baseConfig, domain: check.domain };
+  }
+  
+  return {
+    ...baseConfig,
+    url: check.url,
+    method: check.method || 'GET',
+    expectedStatus: check.expectedStatus || check.expected || 200
+  };
+}
+
+const config = loadConfig();
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
 
-async function checkAllServices() {
-  console.log('Starting status checks...');
-  
-  const results = await Promise.all(config.services.map(checkUrl));
-  const now = new Date();
-  const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  
+/**
+ * Save check results to API directory and generate badges
+ * @param {CheckResult[]} results
+ * @param {Date} now
+ * @param {string} yearMonth
+ */
+function saveResults(results, now, yearMonth) {
   const baseDataDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
   const apiDir = path.join(baseDataDir, 'api');
   const badgeDir = path.join(baseDataDir, 'badge');
@@ -155,12 +158,12 @@ async function checkAllServices() {
     const serviceDir = path.join(apiDir, result.id);
     if (!fs.existsSync(serviceDir)) fs.mkdirSync(serviceDir, { recursive: true });
     
-    const statusData = { 
-      lastCheck: now.toISOString(), 
-      status: result.status, 
-      statusCode: result.statusCode, 
-      responseTime: result.responseTime, 
-      timestamp: result.timestamp, 
+    const statusData = {
+      lastCheck: now.toISOString(),
+      status: result.status,
+      statusCode: result.statusCode,
+      responseTime: result.responseTime,
+      timestamp: result.timestamp,
       error: result.error
     };
     
@@ -170,10 +173,17 @@ async function checkAllServices() {
     if (!fs.existsSync(historyDir)) fs.mkdirSync(historyDir, { recursive: true });
     const historyPath = path.join(historyDir, `${yearMonth}.json`);
     let history = fs.existsSync(historyPath) ? JSON.parse(fs.readFileSync(historyPath, 'utf-8')) : [];
-    history.push({ timestamp: now.toISOString(), status: result.status, statusCode: result.statusCode, responseTime: result.responseTime, error: result.error });
+    history.push({
+      timestamp: now.toISOString(),
+      status: result.status,
+      statusCode: result.statusCode,
+      responseTime: result.responseTime,
+      error: result.error
+    });
     if (history.length > 4320) history = history.slice(-4320);
     fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
   });
+  
   console.log('Status and history saved per service');
   
   if (!fs.existsSync(badgeDir)) fs.mkdirSync(badgeDir, { recursive: true });
@@ -181,22 +191,28 @@ async function checkAllServices() {
     const badge = generateBadge(result.name, result.status, result.status);
     fs.writeFileSync(path.join(badgeDir, `${result.id}.svg`), badge);
   });
+  
   console.log('Badges generated');
-  
-  console.log('\nGenerating HTML files...');
-  
+}
+
+/**
+ * Calculate overall metrics from check results
+ * @param {CheckResult[]} results
+ * @returns {Object}
+ */
+function calculateMetrics(results) {
   const up = results.filter(s => s.status === 'up').length;
   const down = results.filter(s => s.status === 'down').length;
   const maintenance = results.filter(s => s.status === 'maintenance').length;
-  const avgResponseTime = results.length > 0 ? Math.round(results.reduce((sum, s) => sum + s.responseTime, 0) / results.length) : 0;
-  const totalServices = results.length;
+  const total = results.length;
+  const avgResponseTime = total > 0 ? Math.round(results.reduce((sum, s) => sum + s.responseTime, 0) / total) : 0;
   
   let overallStatus = 'operational';
   let overallMessage = lang.allSystemsOperational;
   let overallIcon = '🟢';
   
   if (down > 0) {
-    if (down === totalServices) {
+    if (down === total) {
       overallStatus = 'major';
       overallMessage = lang.majorOutage;
       overallIcon = '🔴';
@@ -207,28 +223,36 @@ async function checkAllServices() {
     }
   }
   
-  const serviceCards = results.map(s => {
-    const allHistory = getServiceHistory(s.id, dataDir);
-    const activeHistory = allHistory.filter(h => h.status !== 'maintenance');
-    const uptimeCount = activeHistory.filter(h => h.status === 'up').length;
-    const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(1) : 100;
-    const trend = calculateTrend(allHistory, s.responseTime);
-    const historyBar = generateHistoryBar(allHistory, '72h', locale);
-    
-    return `
-    <a href="service/${s.id}.html" class="service-card">
+  return { up, down, maintenance, total, avgResponseTime, overallStatus, overallMessage, overallIcon };
+}
+
+/**
+ * Generate service card HTML for dashboard
+ * @param {CheckResult} service
+ * @returns {string}
+ */
+function generateServiceCard(service) {
+  const allHistory = getServiceHistory(service.id, dataDir);
+  const activeHistory = allHistory.filter(h => h.status !== 'maintenance');
+  const uptimeCount = activeHistory.filter(h => h.status === 'up').length;
+  const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(1) : 100;
+  const trend = calculateTrend(allHistory, service.responseTime);
+  const historyBar = generateHistoryBar(allHistory, '72h', locale);
+  
+  return `
+    <a href="service/${service.id}.html" class="service-card">
       <div class="service-header-row">
         <div class="service-name-status">
-          <h3 style="view-transition-name:${s.id}">
-            ${s.name} <span class="${s.status}">●</span>
+          <h3 style="view-transition-name:${service.id}">
+            ${service.name} <span class="${service.status}">●</span>
           </h3>
         </div>
         <div class="service-metrics-inline">
-          <span class="metric-item">${s.responseTime}ms ${trend}</span>
+          <span class="metric-item">${service.responseTime}ms ${trend}</span>
           <span class="metric-item">${uptime}%</span>
         </div>
       </div>
-      <div class="service-history" style="view-transition-name:${s.id}-history">
+      <div class="service-history" style="view-transition-name:${service.id}-history">
         ${historyBar}
         <div class="history-labels">
           <span>72 ${lang.hoursAgo}</span>
@@ -236,33 +260,48 @@ async function checkAllServices() {
         </div>
       </div>
     </a>`;
-  }).join('');
+}
+
+async function checkAllServices() {
+  console.log('Starting status checks...');
+  
+  const results = await Promise.all(config.services.map(checkUrl));
+  const now = new Date();
+  const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  
+  saveResults(results, now, yearMonth);
+  
+  console.log('\nGenerating HTML files...');
+  
+  const metrics = calculateMetrics(results);
+  
+  const serviceCards = results.map(s => generateServiceCard(s)).join('');
   
   const indexHTML = generateHTML(lang.title, `
     <h1 class="title">${lang.title}</h1>
     <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
     
-    <div class="overall-status-banner ${overallStatus}">
-      ${overallIcon} ${overallMessage}
+    <div class="overall-status-banner ${metrics.overallStatus}">
+      ${metrics.overallIcon} ${metrics.overallMessage}
     </div>
     
     <h2>${lang.summary}</h2>
     <div class="stats-grid">
       <div class="stat-card operational">
         <div class="label">${lang.operationalServices}</div>
-        <div class="value">${up}/${totalServices}</div>
-        <div class="description">${((up/totalServices)*100).toFixed(0)}%</div>
+        <div class="value">${metrics.up}/${metrics.total}</div>
+        <div class="description">${((metrics.up/metrics.total)*100).toFixed(0)}%</div>
       </div>
       
       <div class="stat-card issues">
         <div class="label">${lang.issues}</div>
-        <div class="value">${down}</div>
-        <div class="description">${down === 0 ? lang.none : lang.down}</div>
+        <div class="value">${metrics.down}</div>
+        <div class="description">${metrics.down === 0 ? lang.none : lang.down}</div>
       </div>
       
       <div class="stat-card">
         <div class="label">${lang.avgResponseTime}</div>
-        <div class="value">${avgResponseTime}ms</div>
+        <div class="value">${metrics.avgResponseTime}ms</div>
         <div class="description">${lang.average}</div>
       </div>
     </div>
@@ -271,7 +310,7 @@ async function checkAllServices() {
     <div class="services-grid">
       ${serviceCards}
     </div>
-  `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, VERSION, config.report, lang.report);
+  `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, version, config.report, lang.report);
   
   const baseDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
   if (IS_TEMPLATE && !fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
@@ -279,15 +318,30 @@ async function checkAllServices() {
   fs.writeFileSync(path.join(baseDir, 'index.html'), indexHTML);
   console.log(`Generated ${IS_TEMPLATE ? 'demo/' : ''}index.html`);
   
+  generateServicePages(results, now);
+  
+  console.log('\n=== Status Summary ===');
+  results.forEach(r => console.log(`${r.status === 'up' ? '✓' : '✗'} ${r.name}: ${r.status} (${r.responseTime}ms)`));
+  console.log('\n✅ HTML files generated successfully!');
+}
+
+/**
+ * Generate individual service detail pages
+ * @param {CheckResult[]} results
+ * @param {Date} now
+ */
+function generateServicePages(results, now) {
   const serviceHtmlDir = IS_TEMPLATE ? path.join(__dirname, 'demo', 'service') : path.join(__dirname, 'service');
   if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
-  const cssPath = IS_TEMPLATE ? '../../src/global.css' : '../src/global.css';
-  const scriptPath = IS_TEMPLATE ? '../../src/main.js' : '../src/main.js';
-  const apiPath = IS_TEMPLATE ? '../../api' : '../api';
-  const badgePath = IS_TEMPLATE ? '../../badge' : '../badge';
-  const apiAbsPath = IS_TEMPLATE ? '/demo/api' : '/api';
-  const badgeAbsPath = IS_TEMPLATE ? '/demo/badge' : '/badge';
+  const paths = {
+    css: IS_TEMPLATE ? '../../src/global.css' : '../src/global.css',
+    script: IS_TEMPLATE ? '../../src/main.js' : '../src/main.js',
+    api: '../api',
+    badge: '../badge',
+    apiAbs: IS_TEMPLATE ? '/demo/api' : '/api',
+    badgeAbs: IS_TEMPLATE ? '/demo/badge' : '/badge'
+  };
   
   config.services.forEach(service => {
     const allHistory = getServiceHistory(service.id, dataDir);
@@ -383,28 +437,24 @@ async function checkAllServices() {
       
       <details open>
         <summary>${lang.api}</summary>
-        <p><pre>GET <a href="${apiPath}/${service.id}/status.json">${apiAbsPath}/${service.id}/status.json</a></pre></p>
+        <p><pre>GET https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json</pre></p>
         <p>${lang.returnsCurrentStatus}</p>
         
-        <p><pre>GET ${apiAbsPath}/${service.id}/history/YYYY-MM.json</pre></p>
+        <p><pre>GET https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json</pre></p>
         <p>${lang.returnsMonthlyChecks}</p>
       </details>
       
       <details open>
         <summary>${lang.badge}</summary>
         <p>${lang.useBadge}</p>
-        <pre>![${service.name}](https://YOUR_USERNAME.github.io/YOUR_REPO${badgeAbsPath}/${service.id}.svg)</pre>
-        <p><img src="${badgePath}/${service.id}.svg" alt="${service.name} status"></p>
+        <pre>![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)</pre>
+        <p><img src="${paths.badge}/${service.id}.svg" alt="${service.name} status"></p>
       </details>
-    `, cssPath, scriptPath, config.language, VERSION, config.report, lang.report);
+    `, paths.css, paths.script, config.language, version, config.report, lang.report);
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
   });
-  
-  console.log('\n=== Status Summary ===');
-  results.forEach(r => console.log(`${r.status === 'up' ? '✓' : '✗'} ${r.name}: ${r.status} (${r.responseTime}ms)`));
-  console.log('\n✅ HTML files generated successfully!');
 }
 
 /**
@@ -488,7 +538,7 @@ checks:
     method: GET
     expected: 200</code></pre>
     </div>
-  `, 'src/global.css', 'src/main.js', 'en', VERSION, config.report, lang.report);
+  `, 'src/global.css', 'src/main.js', 'en', version, config.report, lang.report);
   
   fs.writeFileSync(path.join(__dirname, 'index.html'), landingHTML);
   console.log('Generated landing at /index.html');
