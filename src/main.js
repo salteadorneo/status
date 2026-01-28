@@ -22,3 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text);
+}

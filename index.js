@@ -440,7 +440,11 @@ function generateServicePages(results, now) {
              <span class="${current.status}">●</span>
              ${service.name}
           </h2>
-          <p>${getMethodBadge(service)} <span style="opacity: 0.8;">${getServiceUrl(service)}</span></p>
+          <p>
+            ${getMethodBadge(service)}
+            <span style="opacity: 0.8;">${getServiceUrl(service)}</span>
+            <button class="copy-button" onclick="copyToClipboard('${getServiceUrl(service)}')"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-copy"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></button>
+          </p>
         </div>
         
         ${current ? `
@@ -505,21 +509,19 @@ function generateServicePages(results, now) {
           <div class="api-endpoints">
             <div class="api-endpoint">
               <div class="endpoint-header">
-                <span class="endpoint-url">GET /api/${service.id}/status.json</span>
+                <span class="method-badge">GET</span>
+                https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json
+                <button class="copy-button" onclick="copyToClipboard('https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json')"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-copy"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></button>
               </div>
               <p class="endpoint-description">${lang.returnsCurrentStatus}</p>
-              <div class="endpoint-request">
-                <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json</div>
-              </div>
             </div>
             <div class="api-endpoint">
               <div class="endpoint-header">
-                <span class="endpoint-url">GET /api/${service.id}/history/YYYY-MM.json</span>
+                <span class="method-badge">GET</span>
+                https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json
+                <button class="copy-button" onclick="copyToClipboard('https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json')"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-copy"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></button>
               </div>
               <p class="endpoint-description">${lang.returnsMonthlyChecks}</p>
-              <div class="endpoint-request">
-                <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json</div>
-              </div>
             </div>
           </div>
         </details>
@@ -530,7 +532,10 @@ function generateServicePages(results, now) {
           <div class="badge-container">
             <img src="${paths.badge}/${service.id}.svg" alt="${service.name} status" />
             <div class="badge-code-wrapper">
-              <div class="badge-code" onclick="this.select(); document.execCommand('copy'); this.classList.add('copied');" onmouseout="this.classList.remove('copied');">![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)</div>
+              <div class="badge-code">
+                <p>![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)</p>
+                <button class="copy-button" onclick="copyToClipboard('![${service.name}](https://salteadorneo.github.io/status${paths.badgeAbs}/${service.id}.svg)')"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-copy"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></button>
+              </div>
             </div>
           </div>
         </details>
