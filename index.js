@@ -78,7 +78,6 @@ if (fs.existsSync(yamlPath)) {
         maintenance: check.maintenance || null
       };
       
-      // Campos específicos según el tipo
       if (check.type === 'tcp') {
         return {
           ...baseConfig,
@@ -91,7 +90,6 @@ if (fs.existsSync(yamlPath)) {
           domain: check.domain
         };
       } else {
-        // HTTP por defecto
         return {
           ...baseConfig,
           url: check.url,
@@ -105,7 +103,6 @@ if (fs.existsSync(yamlPath)) {
   config = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
 }
 
-const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
 
@@ -175,12 +172,11 @@ async function checkAllServices() {
   
   const serviceCards = results.map(s => {
     const allHistory = getServiceHistory(s.id, __dirname);
-    // Excluir mantenimiento del cálculo de uptime
     const activeHistory = allHistory.filter(h => h.status !== 'maintenance');
     const uptimeCount = activeHistory.filter(h => h.status === 'up').length;
     const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(1) : 100;
     const trend = calculateTrend(allHistory, s.responseTime);
-    const historyBar = generateHistoryBar(allHistory, '60d', locale);
+    const historyBar = generateHistoryBar(allHistory, '72h', locale);
     
     return `
     <a href="service/${s.id}.html" class="service-card">
@@ -198,8 +194,8 @@ async function checkAllServices() {
       <div class="service-history" style="view-transition-name:${s.id}-history">
         ${historyBar}
         <div class="history-labels">
-          <span>60 ${lang.daysAgo}</span>
-          <span>${lang.today}</span>
+          <span>72 ${lang.hoursAgo}</span>
+          <span>${lang.now}</span>
         </div>
       </div>
     </a>`;
@@ -248,8 +244,6 @@ async function checkAllServices() {
   
   config.services.forEach(service => {
     const allHistory = getServiceHistory(service.id, __dirname);
-    
-    // Excluir mantenimiento del cálculo de uptime
     const activeHistory = allHistory.filter(s => s.status !== 'maintenance');
     const uptimeCount = activeHistory.filter(s => s.status === 'up').length;
     const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(2) : 100;
@@ -259,9 +253,10 @@ async function checkAllServices() {
     const lastIncidentText = lastIncident ? `${lang.lastIncident}: ${formatDate(lastIncident.timestamp, locale)}` : lang.noIncidents;
     const current = results.find(s => s.id === service.id);
     const trend = current ? calculateTrend(allHistory, current.responseTime) : '→';
-    const historyBar60d = generateHistoryBar(allHistory, '60d', locale);
-    const historyBar30d = generateHistoryBar(allHistory, '30d', locale);
     const historyBar24h = generateHistoryBar(allHistory, '24h', locale);
+    const historyBar72h = generateHistoryBar(allHistory, '72h', locale);
+    const historyBar30d = generateHistoryBar(allHistory, '30d', locale);
+    const historyBar60d = generateHistoryBar(allHistory, '60d', locale);
     const sparkline = generateSparkline(allHistory);
     
     const checksRows = allHistory.slice(-100).reverse().map(c => {
@@ -316,15 +311,17 @@ async function checkAllServices() {
       <div class="history-header">
         <h2>${lang.history}</h2>
         <div class="history-filters">
-          <button class="filter-btn active" data-period="60d" aria-pressed="true">60d</button>
-          <button class="filter-btn" data-period="30d" aria-pressed="false">30d</button>
           <button class="filter-btn" data-period="24h" aria-pressed="false">24h</button>
+          <button class="filter-btn active" data-period="72h" aria-pressed="false">72h</button>
+          <button class="filter-btn" data-period="30d" aria-pressed="false">30d</button>
+          <button class="filter-btn" data-period="60d" aria-pressed="true">60d</button>
         </div>
       </div>
       <div class="history-container" style="view-transition-name:${service.id}-history">
-        <div>${historyBar60d}</div>
-        <div style="display: none;">${historyBar30d}</div>
-        <div style="display: none;">${historyBar24h}</div>
+      <div style="display: none;">${historyBar24h}</div>
+      <div>${historyBar72h}</div>
+      <div style="display: none;">${historyBar30d}</div>
+      <div style="display: none;">${historyBar60d}</div>
       </div>
       
       ${sparkline ? `<h2>${lang.responseTime}</h2>${sparkline}` : ''}
