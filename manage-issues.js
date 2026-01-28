@@ -104,18 +104,3 @@ Automatically resolved by the status monitor.`
     }
   }
 }
-
-// For direct execution in GitHub Actions
-if (process.env.GITHUB_ACTIONS) {
-  const { Octokit } = await import('@octokit/rest');
-  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-  
-  const context = {
-    repo: {
-      owner: process.env.GITHUB_REPOSITORY.split('/')[0],
-      repo: process.env.GITHUB_REPOSITORY.split('/')[1]
-    }
-  };
-  
-  await manageIssues(octokit, context);
-}
