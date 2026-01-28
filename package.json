@@ -1,13 +1,17 @@
 {
   "name": "status",
   "type": "module",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Lightweight static status monitoring system for GitHub Pages",
   "license": "MIT",
   "scripts": {
     "dev": "node --watch index.js",
     "build": "node index.js",
     "test": "node --test",
-    "test:watch": "node --test --watch"
+    "test:watch": "node --test --watch",
+    "release:patch": "node scripts/release.js patch",
+    "release:minor": "node scripts/release.js minor",
+    "release:major": "node scripts/release.js major",
+    "release:dry": "node scripts/release.js"
   }
 }
