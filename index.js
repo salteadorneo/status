@@ -201,8 +201,8 @@ async function checkAllServices() {
     </a>`;
   }).join('');
   
-  const indexHTML = generateHTML(lang.statusMonitor, `
-    <h1>${lang.statusMonitor}</h1>
+  const indexHTML = generateHTML(lang.title, `
+    <h1 class="title">${lang.title}</h1>
     <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
     
     <div class="overall-status-banner ${overallStatus}">
@@ -259,13 +259,13 @@ async function checkAllServices() {
     const historyBar60d = generateHistoryBar(allHistory, '60d', locale);
     const sparkline = generateSparkline(allHistory);
     
-    const checksRows = allHistory.slice(-100).reverse().map(c => {
+    const checksRows = allHistory.slice(-10).reverse().map(c => {
       const errorText = c.statusCode ? `HTTP ${c.statusCode}${c.error ? ': ' + c.error : ''}` : (c.error || '-');
       return `<tr><td>${formatDate(c.timestamp, locale)}</td><td class="${c.status}">●</td><td>${c.responseTime}ms</td><td>${errorText}</td></tr>`;
     }).join('');
     
     const serviceHTML = generateHTML(`${service.name} - ${lang.status}`, `
-      <h1>${lang.statusMonitor}</h1>
+      <h1 class="title">${lang.title}</h1>
       <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString(), locale)}</p>
       
       <p><a href="../index.html">← ${lang.backToDashboard}</a></p>
@@ -326,12 +326,15 @@ async function checkAllServices() {
       
       ${sparkline ? `<h2>${lang.responseTime}</h2>${sparkline}` : ''}
       
-      <details>
+      <details open>
         <summary>${lang.latestChecks}</summary>
-        <table><thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead><tbody>${checksRows}</tbody></table>
+        <table>
+          <thead><tr><th>${lang.date}</th><th>${lang.status}</th><th>${lang.time}</th><th>${lang.error}</th></tr></thead>
+          <tbody>${checksRows}</tbody>
+        </table>
       </details>
       
-      <details>
+      <details open>
         <summary>${lang.api}</summary>
         <p><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
         <p>${lang.returnsCurrentStatus}</p>
@@ -340,7 +343,7 @@ async function checkAllServices() {
         <p>${lang.returnsMonthlyChecks}</p>
       </details>
       
-      <details>
+      <details open>
         <summary>${lang.badge}</summary>
         <p>${lang.useBadge}</p>
         <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
