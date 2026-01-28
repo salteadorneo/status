@@ -47,5 +47,47 @@
     "statusCode": 404,
     "responseTime": 98,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:23:44.479Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 61,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:32:48.307Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 72,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:49:12.656Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 113,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:59:49.997Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 99,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T20:13:59.534Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 71,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T20:33:10.715Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 66,
+    "error": null
   }
 ]

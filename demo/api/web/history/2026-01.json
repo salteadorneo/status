@@ -47,5 +47,47 @@
     "statusCode": 200,
     "responseTime": 165,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:23:44.479Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 144,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:32:48.307Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 217,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:49:12.656Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 338,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T19:59:49.997Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 162,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T20:13:59.534Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 188,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T20:33:10.715Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 222,
+    "error": null
   }
 ]
