@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,10 +8,15 @@
 </head>
 <body>
 
+      <h1>Monitor de Estado</h1>
+      <p class="last-update">Última actualización: 28 de enero de 2026, 02:29</p>
+      
       <p><a href="../index.html">← Volver al dashboard</a></p>
       
       <div class="service-header">
-        <h1>Web <span class="up">●</span></h1>
+        <h2 style="view-transition-name:web">
+          Web <span class="up">●</span>
+        </h2>
         <p><a href="https://salteadorneo.github.io/status/" target="_blank">https://salteadorneo.github.io/status/</a></p>
       </div>
       
@@ -19,7 +24,7 @@
       <div class="service-stats">
         <div class="service-stat">
           <div class="label">Tiempo de respuesta</div>
-          <div class="value">165ms →</div>
+          <div class="value">240ms ↑</div>
         </div>
         
         <div class="service-stat">
@@ -29,7 +34,7 @@
         
         <div class="service-stat">
           <div class="label">Tiempo de respuesta promedio</div>
-          <div class="value">196ms</div>
+          <div class="value">205ms</div>
         </div>
         
         <div class="service-stat">
@@ -39,56 +44,60 @@
         
         <div class="service-stat">
           <div class="label">Última verificación</div>
-          <div class="value" style="font-size: 0.75rem;">28 de enero de 2026, 02:08</div>
+          <div class="value" style="font-size: 0.75rem;">28 de enero de 2026, 02:29</div>
         </div>
       </div>
       
-      <p style="opacity: 0.7; font-size: 0.9rem;">No incidents recorded</p>
+      <p style="opacity: 0.7; font-size: 0.9rem;">No hay incidentes registrados</p>
       
       
       <div class="history-header">
-        <h2>History</h2>
+        <h2>Historial</h2>
         <div class="history-filters">
           <button class="filter-btn active" data-period="60d" aria-pressed="true">60d</button>
           <button class="filter-btn" data-period="30d" aria-pressed="false">30d</button>
           <button class="filter-btn" data-period="24h" aria-pressed="false">24h</button>
         </div>
       </div>
-      <div class="history-container">
-        <div><div class="history" data-period="60d"><div class="history-day " title="2025-11-30"></div><div class="history-day " title="2025-12-01"></div><div class="history-day " title="2025-12-02"></div><div class="history-day " title="2025-12-03"></div><div class="history-day " title="2025-12-04"></div><div class="history-day " title="2025-12-05"></div><div class="history-day " title="2025-12-06"></div><div class="history-day " title="2025-12-07"></div><div class="history-day " title="2025-12-08"></div><div class="history-day " title="2025-12-09"></div><div class="history-day " title="2025-12-10"></div><div class="history-day " title="2025-12-11"></div><div class="history-day " title="2025-12-12"></div><div class="history-day " title="2025-12-13"></div><div class="history-day " title="2025-12-14"></div><div class="history-day " title="2025-12-15"></div><div class="history-day " title="2025-12-16"></div><div class="history-day " title="2025-12-17"></div><div class="history-day " title="2025-12-18"></div><div class="history-day " title="2025-12-19"></div><div class="history-day " title="2025-12-20"></div><div class="history-day " title="2025-12-21"></div><div class="history-day " title="2025-12-22"></div><div class="history-day " title="2025-12-23"></div><div class="history-day " title="2025-12-24"></div><div class="history-day " title="2025-12-25"></div><div class="history-day " title="2025-12-26"></div><div class="history-day " title="2025-12-27"></div><div class="history-day " title="2025-12-28"></div><div class="history-day " title="2025-12-29"></div><div class="history-day " title="2025-12-30"></div><div class="history-day " title="2025-12-31"></div><div class="history-day " title="2026-01-01"></div><div class="history-day " title="2026-01-02"></div><div class="history-day " title="2026-01-03"></div><div class="history-day " title="2026-01-04"></div><div class="history-day " title="2026-01-05"></div><div class="history-day " title="2026-01-06"></div><div class="history-day " title="2026-01-07"></div><div class="history-day " title="2026-01-08"></div><div class="history-day " title="2026-01-09"></div><div class="history-day " title="2026-01-10"></div><div class="history-day " title="2026-01-11"></div><div class="history-day " title="2026-01-12"></div><div class="history-day " title="2026-01-13"></div><div class="history-day " title="2026-01-14"></div><div class="history-day " title="2026-01-15"></div><div class="history-day " title="2026-01-16"></div><div class="history-day " title="2026-01-17"></div><div class="history-day " title="2026-01-18"></div><div class="history-day " title="2026-01-19"></div><div class="history-day " title="2026-01-20"></div><div class="history-day " title="2026-01-21"></div><div class="history-day " title="2026-01-22"></div><div class="history-day " title="2026-01-23"></div><div class="history-day " title="2026-01-24"></div><div class="history-day " title="2026-01-25"></div><div class="history-day " title="2026-01-26"></div><div class="history-day " title="2026-01-27"></div><div class="history-day up" title="2026-01-28: 100% uptime (4 checks)"></div></div></div>
-        <div style="display: none;"><div class="history" data-period="30d"><div class="history-day " title="2025-12-30"></div><div class="history-day " title="2025-12-31"></div><div class="history-day " title="2026-01-01"></div><div class="history-day " title="2026-01-02"></div><div class="history-day " title="2026-01-03"></div><div class="history-day " title="2026-01-04"></div><div class="history-day " title="2026-01-05"></div><div class="history-day " title="2026-01-06"></div><div class="history-day " title="2026-01-07"></div><div class="history-day " title="2026-01-08"></div><div class="history-day " title="2026-01-09"></div><div class="history-day " title="2026-01-10"></div><div class="history-day " title="2026-01-11"></div><div class="history-day " title="2026-01-12"></div><div class="history-day " title="2026-01-13"></div><div class="history-day " title="2026-01-14"></div><div class="history-day " title="2026-01-15"></div><div class="history-day " title="2026-01-16"></div><div class="history-day " title="2026-01-17"></div><div class="history-day " title="2026-01-18"></div><div class="history-day " title="2026-01-19"></div><div class="history-day " title="2026-01-20"></div><div class="history-day " title="2026-01-21"></div><div class="history-day " title="2026-01-22"></div><div class="history-day " title="2026-01-23"></div><div class="history-day " title="2026-01-24"></div><div class="history-day " title="2026-01-25"></div><div class="history-day " title="2026-01-26"></div><div class="history-day " title="2026-01-27"></div><div class="history-day up" title="2026-01-28: 100% uptime (4 checks)"></div></div></div>
-        <div style="display: none;"><div class="history" data-period="24h"><div class="history-day " title="03:08"></div><div class="history-day " title="04:08"></div><div class="history-day " title="05:08"></div><div class="history-day " title="06:08"></div><div class="history-day " title="07:08"></div><div class="history-day " title="08:08"></div><div class="history-day " title="09:08"></div><div class="history-day " title="10:08"></div><div class="history-day " title="11:08"></div><div class="history-day " title="12:08"></div><div class="history-day " title="13:08"></div><div class="history-day " title="14:08"></div><div class="history-day " title="15:08"></div><div class="history-day " title="16:08"></div><div class="history-day " title="17:08"></div><div class="history-day " title="18:08"></div><div class="history-day " title="19:08"></div><div class="history-day " title="20:08"></div><div class="history-day " title="21:08"></div><div class="history-day " title="22:08"></div><div class="history-day " title="23:08"></div><div class="history-day up" title="00:08: 100% uptime (2 checks)"></div><div class="history-day up" title="01:08: 100% uptime (1 checks)"></div><div class="history-day up" title="02:08: 100% uptime (1 checks)"></div></div></div>
+      <div class="history-container" style="view-transition-name:web-history">
+        <div><div class="history" data-period="60d"><div class="history-day " title="2025-11-30"></div><div class="history-day " title="2025-12-01"></div><div class="history-day " title="2025-12-02"></div><div class="history-day " title="2025-12-03"></div><div class="history-day " title="2025-12-04"></div><div class="history-day " title="2025-12-05"></div><div class="history-day " title="2025-12-06"></div><div class="history-day " title="2025-12-07"></div><div class="history-day " title="2025-12-08"></div><div class="history-day " title="2025-12-09"></div><div class="history-day " title="2025-12-10"></div><div class="history-day " title="2025-12-11"></div><div class="history-day " title="2025-12-12"></div><div class="history-day " title="2025-12-13"></div><div class="history-day " title="2025-12-14"></div><div class="history-day " title="2025-12-15"></div><div class="history-day " title="2025-12-16"></div><div class="history-day " title="2025-12-17"></div><div class="history-day " title="2025-12-18"></div><div class="history-day " title="2025-12-19"></div><div class="history-day " title="2025-12-20"></div><div class="history-day " title="2025-12-21"></div><div class="history-day " title="2025-12-22"></div><div class="history-day " title="2025-12-23"></div><div class="history-day " title="2025-12-24"></div><div class="history-day " title="2025-12-25"></div><div class="history-day " title="2025-12-26"></div><div class="history-day " title="2025-12-27"></div><div class="history-day " title="2025-12-28"></div><div class="history-day " title="2025-12-29"></div><div class="history-day " title="2025-12-30"></div><div class="history-day " title="2025-12-31"></div><div class="history-day " title="2026-01-01"></div><div class="history-day " title="2026-01-02"></div><div class="history-day " title="2026-01-03"></div><div class="history-day " title="2026-01-04"></div><div class="history-day " title="2026-01-05"></div><div class="history-day " title="2026-01-06"></div><div class="history-day " title="2026-01-07"></div><div class="history-day " title="2026-01-08"></div><div class="history-day " title="2026-01-09"></div><div class="history-day " title="2026-01-10"></div><div class="history-day " title="2026-01-11"></div><div class="history-day " title="2026-01-12"></div><div class="history-day " title="2026-01-13"></div><div class="history-day " title="2026-01-14"></div><div class="history-day " title="2026-01-15"></div><div class="history-day " title="2026-01-16"></div><div class="history-day " title="2026-01-17"></div><div class="history-day " title="2026-01-18"></div><div class="history-day " title="2026-01-19"></div><div class="history-day " title="2026-01-20"></div><div class="history-day " title="2026-01-21"></div><div class="history-day " title="2026-01-22"></div><div class="history-day " title="2026-01-23"></div><div class="history-day " title="2026-01-24"></div><div class="history-day " title="2026-01-25"></div><div class="history-day " title="2026-01-26"></div><div class="history-day " title="2026-01-27"></div><div class="history-day up" title="2026-01-28: 100% uptime (5 checks)"></div></div></div>
+        <div style="display: none;"><div class="history" data-period="30d"><div class="history-day " title="2025-12-30"></div><div class="history-day " title="2025-12-31"></div><div class="history-day " title="2026-01-01"></div><div class="history-day " title="2026-01-02"></div><div class="history-day " title="2026-01-03"></div><div class="history-day " title="2026-01-04"></div><div class="history-day " title="2026-01-05"></div><div class="history-day " title="2026-01-06"></div><div class="history-day " title="2026-01-07"></div><div class="history-day " title="2026-01-08"></div><div class="history-day " title="2026-01-09"></div><div class="history-day " title="2026-01-10"></div><div class="history-day " title="2026-01-11"></div><div class="history-day " title="2026-01-12"></div><div class="history-day " title="2026-01-13"></div><div class="history-day " title="2026-01-14"></div><div class="history-day " title="2026-01-15"></div><div class="history-day " title="2026-01-16"></div><div class="history-day " title="2026-01-17"></div><div class="history-day " title="2026-01-18"></div><div class="history-day " title="2026-01-19"></div><div class="history-day " title="2026-01-20"></div><div class="history-day " title="2026-01-21"></div><div class="history-day " title="2026-01-22"></div><div class="history-day " title="2026-01-23"></div><div class="history-day " title="2026-01-24"></div><div class="history-day " title="2026-01-25"></div><div class="history-day " title="2026-01-26"></div><div class="history-day " title="2026-01-27"></div><div class="history-day up" title="2026-01-28: 100% uptime (5 checks)"></div></div></div>
+        <div style="display: none;"><div class="history" data-period="24h"><div class="history-day " title="03:29"></div><div class="history-day " title="04:29"></div><div class="history-day " title="05:29"></div><div class="history-day " title="06:29"></div><div class="history-day " title="07:29"></div><div class="history-day " title="08:29"></div><div class="history-day " title="09:29"></div><div class="history-day " title="10:29"></div><div class="history-day " title="11:29"></div><div class="history-day " title="12:29"></div><div class="history-day " title="13:29"></div><div class="history-day " title="14:29"></div><div class="history-day " title="15:29"></div><div class="history-day " title="16:29"></div><div class="history-day " title="17:29"></div><div class="history-day " title="18:29"></div><div class="history-day " title="19:29"></div><div class="history-day " title="20:29"></div><div class="history-day " title="21:29"></div><div class="history-day " title="22:29"></div><div class="history-day " title="23:29"></div><div class="history-day up" title="00:29: 100% uptime (2 checks)"></div><div class="history-day up" title="01:29: 100% uptime (1 checks)"></div><div class="history-day up" title="02:29: 100% uptime (2 checks)"></div></div></div>
       </div>
       
-      <h2>Response time (last 50 checks)</h2><svg width="900" height="200" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200">
-  <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M5,77.54545454545455 C54.4,77.5 202.8,89.6 301.7,77.5 C400.6,65.5 499.4,-14.6 598.3,5.0 C697.2,24.6 845.6,163.3 895.0,195.0"/>
-  <text x="5" y="195" font-size="10" fill="currentColor" opacity="0.6">165ms</text>
-  <text x="5" y="12" font-size="10" fill="currentColor" opacity="0.6">220ms</text>
+      <h2>Tiempo de respuesta</h2><svg width="900" height="200" style="width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 200">
+  <line x1="45" y1="170" x2="50" y2="170" stroke="currentColor" opacity="0.3" stroke-width="1"/><line x1="50" y1="170" x2="880" y2="170" stroke="currentColor" opacity="0.1" stroke-width="1" stroke-dasharray="2,2"/><text x="42" y="173" font-size="10" fill="currentColor" opacity="0.6" text-anchor="end">0</text><line x1="45" y1="120" x2="50" y2="120" stroke="currentColor" opacity="0.3" stroke-width="1"/><line x1="50" y1="120" x2="880" y2="120" stroke="currentColor" opacity="0.1" stroke-width="1" stroke-dasharray="2,2"/><text x="42" y="123" font-size="10" fill="currentColor" opacity="0.6" text-anchor="end">100</text><line x1="45" y1="70" x2="50" y2="70" stroke="currentColor" opacity="0.3" stroke-width="1"/><line x1="50" y1="70" x2="880" y2="70" stroke="currentColor" opacity="0.1" stroke-width="1" stroke-dasharray="2,2"/><text x="42" y="73" font-size="10" fill="currentColor" opacity="0.6" text-anchor="end">200</text><line x1="45" y1="20" x2="50" y2="20" stroke="currentColor" opacity="0.3" stroke-width="1"/><line x1="50" y1="20" x2="880" y2="20" stroke="currentColor" opacity="0.1" stroke-width="1" stroke-dasharray="2,2"/><text x="42" y="23" font-size="10" fill="currentColor" opacity="0.6" text-anchor="end">300</text>
+  <line x1="50" y1="170" x2="880" y2="170" stroke="currentColor" opacity="0.3" stroke-width="1"/>
+  <line x1="50" y1="20" x2="50" y2="170" stroke="currentColor" opacity="0.3" stroke-width="1"/>
+  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M50,70.5 C84.6,70.5 188.3,72.3 257.5,70.5 C326.7,68.8 395.8,57.2 465.0,60.0 C534.2,62.8 603.3,89.2 672.5,87.5 C741.7,85.8 845.4,56.3 880.0,50.0"/>
+  <circle cx="50" cy="70.5" r="3" fill="currentColor" opacity="0.7"><title>199ms</title></circle><circle cx="257.5" cy="70.5" r="3" fill="currentColor" opacity="0.7"><title>199ms</title></circle><circle cx="465" cy="60.000000000000014" r="3" fill="currentColor" opacity="0.7"><title>220ms</title></circle><circle cx="672.5" cy="87.5" r="3" fill="currentColor" opacity="0.7"><title>165ms</title></circle><circle cx="880" cy="50" r="3" fill="currentColor" opacity="0.7"><title>240ms</title></circle>
 </svg>
       
       <details>
-        <summary><h2 style="display: inline-block; cursor: pointer;">Últimas Verificaciones (4)</h2></summary>
-        <table><thead><tr><th>Fecha</th><th>Estado</th><th>Tiempo</th><th>Error</th></tr></thead><tbody><tr><td>28 de enero de 2026, 02:08</td><td class="up">●</td><td>165ms</td><td>HTTP 200</td></tr><tr><td>28 de enero de 2026, 01:19</td><td class="up">●</td><td>220ms</td><td>HTTP 200</td></tr><tr><td>28 de enero de 2026, 00:40</td><td class="up">●</td><td>199ms</td><td>HTTP 200</td></tr><tr><td>28 de enero de 2026, 00:18</td><td class="up">●</td><td>199ms</td><td>HTTP 200</td></tr></tbody></table>
+        <summary>Últimas verificaciones</summary>
+        <table><thead><tr><th>Fecha</th><th>Estado</th><th>Tiempo</th><th>Error</th></tr></thead><tbody><tr><td>28 de enero de 2026, 02:29</td><td class="up">●</td><td>240ms</td><td>HTTP 200</td></tr><tr><td>28 de enero de 2026, 02:08</td><td class="up">●</td><td>165ms</td><td>HTTP 200</td></tr><tr><td>28 de enero de 2026, 01:19</td><td class="up">●</td><td>220ms</td><td>HTTP 200</td></tr><tr><td>28 de enero de 2026, 00:40</td><td class="up">●</td><td>199ms</td><td>HTTP 200</td></tr><tr><td>28 de enero de 2026, 00:18</td><td class="up">●</td><td>199ms</td><td>HTTP 200</td></tr></tbody></table>
       </details>
       
       <details>
-        <summary><h2>API</h2></summary>
-        <p style="margin:0;"><code>GET <a href="../api/web/status.json">/api/web/status.json</a></code></p>
-        <p style="margin:0;">Returns the current status of this service.</p>
+        <summary>API</summary>
+        <p><code>GET <a href="../api/web/status.json">/api/web/status.json</a></code></p>
+        <p>Devuelve el estado actual de este servicio.</p>
         
-        <p style="margin:0;"><code>GET /api/web/history/YYYY-MM.json</code></p>
-        <p style="margin:0;">Returns all checks for a specific month.</p>
+        <p><code>GET /api/web/history/YYYY-MM.json</code></p>
+        <p>Devuelve todas las comprobaciones de un mes específico.</p>
       </details>
       
-      <h2>Badge</h2>
-      <p>Use this badge to embed the status in other pages:</p>
-      <pre>![Web](https://salteadorneo.github.io/status/badge/web.svg)</pre>
-      <p><img src="../badge/web.svg" alt="Web status"></p>
+      <details>
+        <summary>Badge</summary>
+        <p>Usa este badge para mostrar el estado en otras páginas:</p>
+        <pre>![Web](https://salteadorneo.github.io/status/badge/web.svg)</pre>
+        <p><img src="../badge/web.svg" alt="Web status"></p>
+      </details>
     
 <footer>
   <a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> salteadorneo/status
-  </a>&nbsp;v1.0.2
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> salteadorneo/status
+  </a>&nbsp;v1.0.0
 </footer>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
