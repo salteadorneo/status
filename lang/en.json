@@ -61,5 +61,6 @@
   "useBadge": "Use this badge to embed the status in other pages:",
   "allSystemsOperational": "All systems operational",
   "partialOutage": "Partial outage",
-  "majorOutage": "Major outage"
+  "majorOutage": "Major outage",
+  "report": "Report an issue"
 }

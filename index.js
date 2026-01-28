@@ -69,6 +69,7 @@ if (fs.existsSync(yamlPath)) {
   const parsed = parseYAML(yamlContent);
   config = {
     language: parsed.language || 'en',
+    report: parsed.report || null,
     services: (parsed.checks || parsed.services || []).map((check, index) => {
       const baseConfig = {
         id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
@@ -234,7 +235,7 @@ async function checkAllServices() {
     <div class="services-grid">
       ${serviceCards}
     </div>
-  `);
+  `, 'global.css', false, config.language, '1.0.0', config.report, lang.report);
   
   fs.writeFileSync(path.join(__dirname, 'index.html'), indexHTML);
   console.log('Generated index.html');
@@ -349,7 +350,7 @@ async function checkAllServices() {
         <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
         <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
       </details>
-    `, '../global.css', true);
+    `, '../global.css', true, config.language, '1.0.0', config.report, lang.report);
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);

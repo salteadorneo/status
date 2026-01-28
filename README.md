@@ -102,6 +102,7 @@ One file: `config.yml`
 
 ```yaml
 language: en  # "en" or "es"
+report: https://github.com/user/repo/issues/new  # Optional: "Report an issue" link
 
 checks:
   - name: My Service      # Display name
@@ -113,6 +114,11 @@ checks:
     expected: 201         # Optional (default: 200)
     timeout: 5000         # Optional (default: 10000)
 ```
+
+**report examples:**
+- External URL: `https://github.com/user/repo/issues/new`
+- Email (auto-detected): `support@example.com` → becomes `mailto:support@example.com`
+- If not set, the link won't be displayed
 
 **Minimal defaults:**
 - `method`: GET

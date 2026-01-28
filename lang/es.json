@@ -61,5 +61,6 @@
   "useBadge": "Usa este badge para mostrar el estado en otras páginas:",
   "allSystemsOperational": "Todos los sistemas operativos",
   "partialOutage": "Interrupción parcial",
-  "majorOutage": "Interrupción mayor"
+  "majorOutage": "Interrupción mayor",
+  "report": "Reportar un problema"
 }

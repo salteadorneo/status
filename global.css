@@ -81,6 +81,24 @@ body {
   color: var(--text-color);
 }
 
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  font-size: 0.9rem;
+}
+
 .title {
   font-size: 2rem;
 }

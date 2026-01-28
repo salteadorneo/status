@@ -1,4 +1,5 @@
 language: es
+report: https://github.com/salteadorneo/status/issues/new
 
 checks:
   - name: Web
