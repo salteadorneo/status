@@ -132,6 +132,12 @@ footer {
       text-decoration: none;
     }
   }
+
+  img {
+    display: inline-block;
+    vertical-align: middle;
+    max-height: 2rem;
+  }
 }
 
 .overall-status-banner {
@@ -556,7 +562,7 @@ p .method-badge + pre {
   text-decoration: none;
   font-weight: bold;
   transition: opacity 0.2s;
-  
+
   &:hover {
     opacity: 0.8;
   }

@@ -102,6 +102,8 @@ function loadConfig() {
     return {
       language: parsed.language || 'en',
       report: parsed.report || null,
+      logo: parsed.logo || null,
+      title: parsed.title || null,
       services: (parsed.checks || parsed.services || []).map(normalizeService)
     };
   }
@@ -142,6 +144,22 @@ function normalizeService(check) {
 const config = loadConfig();
 const lang = JSON.parse(fs.readFileSync(path.join(__dirname, `lang/${config.language || 'en'}.json`), 'utf-8'));
 const locale = config.language === 'es' ? 'es-ES' : 'en-US';
+
+/**
+ * Generate title HTML with logo if configured
+ * @param {string|null} linkUrl - URL to link to (null for no link)
+ * @returns {string}
+ */
+function generateTitle(linkUrl = null) {
+  const titleText = config.title || lang.title;
+  const content = config.logo 
+    ? `<img src="${config.logo}" alt="${titleText}" style="height: 2rem; vertical-align: middle;" />`
+    : titleText;
+  
+  return linkUrl 
+    ? `<a href="${linkUrl}">${content}</a>`
+    : content;
+}
 
 /**
  * Save check results to API directory and generate badges
@@ -315,9 +333,9 @@ async function checkAllServices() {
   
   const reportLink = generateReportLink(config.report, lang.report);
   
-  const indexHTML = generateHTML(lang.title, `
+  const indexHTML = generateHTML(config.title || lang.title, `
     <header>
-      <h1 class="title">${IS_TEMPLATE ? `<a href="../index.html">${lang.title}</a>` : lang.title}</h1>
+      <h1 class="title">${generateTitle(IS_TEMPLATE ? '../index.html' : null)}</h1>
       ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
     </header>
     <main>
@@ -411,7 +429,7 @@ function generateServicePages(results, now) {
     
     const serviceHTML = generateHTML(`${service.name} - ${lang.status}`, `
       <header>
-        <h1 class="title">${IS_TEMPLATE ? `<a href="../../index.html">${lang.title}</a>` : lang.title}</h1>
+        <h1 class="title">${generateTitle(IS_TEMPLATE ? '../../index.html' : null)}</h1>
         ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
       </header>
       <main>        
