@@ -325,7 +325,7 @@ async function checkAllServices() {
       </div>
       ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
     </header>
-
+    <main>
     <h1 class="title">${lang.title}</h1>
     <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
     
@@ -358,7 +358,8 @@ async function checkAllServices() {
     <div class="services-grid">
       ${serviceCards}
     </div>
-  `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, version, config.report, lang.report);
+    </main>
+  `, IS_TEMPLATE ? '../src/global.css' : 'src/global.css', IS_TEMPLATE ? '../src/main.js' : 'src/main.js', config.language, version, config.report, lang.report, IS_TEMPLATE ? lang.demoBannerIndex : null);
   
   const baseDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
   if (IS_TEMPLATE && !fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
@@ -425,7 +426,7 @@ function generateServicePages(results, now) {
         </div>
         ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
       </header>
-
+      <main>
       <h1 class="title">${lang.title}</h1>
       <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString(), locale)}</p>
       
@@ -529,7 +530,8 @@ function generateServicePages(results, now) {
           </div>
         </div>
       </details>
-    `, paths.css, paths.script, config.language, version, config.report, lang.report);
+      </main>
+    `, paths.css, paths.script, config.language, version, config.report, lang.report, IS_TEMPLATE ? lang.demoBanner : null);
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
@@ -543,6 +545,7 @@ function generateLandingPage() {
   console.log('\n📄 Generating landing page (template mode)...');
   
   const landingHTML = generateHTML('Status - Zero-dependency GitHub Pages uptime monitoring', `
+    <main>
     <div class="landing-hero">
       <h1 class="landing-title">📊 Status</h1>
       <p class="landing-subtitle">Zero-dependency uptime monitoring for GitHub Pages</p>
@@ -617,6 +620,7 @@ checks:
     method: GET
     expected: 200</code></pre>
     </div>
+    </main>
   `, 'src/global.css', 'src/main.js', 'en', version, config.report, lang.report);
   
   fs.writeFileSync(path.join(__dirname, 'index.html'), landingHTML);

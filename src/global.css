@@ -74,11 +74,32 @@ table {
 }
 
 body {
-  max-width: 900px;
-  margin: 1rem auto;
-  padding: 0 1rem;
   background: var(--bg-color);
   color: var(--text-color);
+}
+
+header,
+main,
+footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+  }
 }
 
 .page-header {
@@ -493,22 +514,6 @@ pre {
 p .method-badge + pre {
   margin-left: 0.5rem;
   display: inline-block;
-}
-
-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 2rem 0 1rem;
-
-  a {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-color);
-    text-decoration: none;
-  }
 }
 
 .landing-hero {
