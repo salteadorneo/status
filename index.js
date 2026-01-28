@@ -59,6 +59,31 @@ const __dirname = path.dirname(__filename);
 const RETRIES = 3;
 const RETRY_DELAY = 2000;
 
+/**
+ * Read .env file and parse IS_TEMPLATE variable
+ * @returns {boolean} True if IS_TEMPLATE=true in .env
+ */
+function isTemplateMode() {
+  const envPath = path.join(__dirname, '.env');
+  if (!fs.existsSync(envPath)) return false;
+  
+  try {
+    const envContent = fs.readFileSync(envPath, 'utf-8');
+    const match = envContent.match(/^IS_TEMPLATE\s*=\s*(.+)$/m);
+    if (!match) return false;
+    
+    const value = match[1].trim().toLowerCase();
+    return value === 'true' || value === '1';
+  } catch (error) {
+    console.error('Error reading .env:', error);
+    return false;
+  }
+}
+
+const IS_TEMPLATE = isTemplateMode();
+
+const dataDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
+
 /** @type {Config} */
 let config;
 const yamlPath = path.join(__dirname, 'config.yml');
@@ -114,8 +139,12 @@ async function checkAllServices() {
   const now = new Date();
   const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   
+  const baseDataDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
+  const apiDir = path.join(baseDataDir, 'api');
+  const badgeDir = path.join(baseDataDir, 'badge');
+  
   results.forEach(result => {
-    const serviceDir = path.join(__dirname, 'api', result.id);
+    const serviceDir = path.join(apiDir, result.id);
     if (!fs.existsSync(serviceDir)) fs.mkdirSync(serviceDir, { recursive: true });
     
     const statusData = { 
@@ -139,7 +168,6 @@ async function checkAllServices() {
   });
   console.log('Status and history saved per service');
   
-  const badgeDir = path.join(__dirname, 'badge');
   if (!fs.existsSync(badgeDir)) fs.mkdirSync(badgeDir, { recursive: true });
   results.forEach(result => {
     const badge = generateBadge(result.name, result.status, result.status);
@@ -172,7 +200,7 @@ async function checkAllServices() {
   }
   
   const serviceCards = results.map(s => {
-    const allHistory = getServiceHistory(s.id, __dirname);
+    const allHistory = getServiceHistory(s.id, dataDir);
     const activeHistory = allHistory.filter(h => h.status !== 'maintenance');
     const uptimeCount = activeHistory.filter(h => h.status === 'up').length;
     const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(1) : 100;
@@ -235,16 +263,25 @@ async function checkAllServices() {
     <div class="services-grid">
       ${serviceCards}
     </div>
-  `, 'global.css', false, config.language, '1.0.0', config.report, lang.report);
+  `, IS_TEMPLATE ? '../global.css' : 'global.css', false, config.language, '1.0.0', config.report, lang.report);
   
-  fs.writeFileSync(path.join(__dirname, 'index.html'), indexHTML);
-  console.log('Generated index.html');
+  const baseDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
+  if (IS_TEMPLATE && !fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
   
-  const serviceHtmlDir = path.join(__dirname, 'service');
+  fs.writeFileSync(path.join(baseDir, 'index.html'), indexHTML);
+  console.log(`Generated ${IS_TEMPLATE ? 'demo/' : ''}index.html`);
+  
+  const serviceHtmlDir = IS_TEMPLATE ? path.join(__dirname, 'demo', 'service') : path.join(__dirname, 'service');
   if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
+  const cssPath = IS_TEMPLATE ? '../../global.css' : '../global.css';
+  const apiPath = IS_TEMPLATE ? '../../api' : '../api';
+  const badgePath = IS_TEMPLATE ? '../../badge' : '../badge';
+  const apiAbsPath = IS_TEMPLATE ? '/demo/api' : '/api';
+  const badgeAbsPath = IS_TEMPLATE ? '/demo/badge' : '/badge';
+  
   config.services.forEach(service => {
-    const allHistory = getServiceHistory(service.id, __dirname);
+    const allHistory = getServiceHistory(service.id, dataDir);
     const activeHistory = allHistory.filter(s => s.status !== 'maintenance');
     const uptimeCount = activeHistory.filter(s => s.status === 'up').length;
     const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(2) : 100;
@@ -337,20 +374,20 @@ async function checkAllServices() {
       
       <details open>
         <summary>${lang.api}</summary>
-        <p><code>GET <a href="../api/${service.id}/status.json">/api/${service.id}/status.json</a></code></p>
+        <p><pre>GET <a href="${apiPath}/${service.id}/status.json">${apiAbsPath}/${service.id}/status.json</a></pre></p>
         <p>${lang.returnsCurrentStatus}</p>
         
-        <p><code>GET /api/${service.id}/history/YYYY-MM.json</code></p>
+        <p><pre>GET ${apiAbsPath}/${service.id}/history/YYYY-MM.json</pre></p>
         <p>${lang.returnsMonthlyChecks}</p>
       </details>
       
       <details open>
         <summary>${lang.badge}</summary>
         <p>${lang.useBadge}</p>
-        <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
-        <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
+        <pre>![${service.name}](https://YOUR_USERNAME.github.io/YOUR_REPO${badgeAbsPath}/${service.id}.svg)</pre>
+        <p><img src="${badgePath}/${service.id}.svg" alt="${service.name} status"></p>
       </details>
-    `, '../global.css', true, config.language, '1.0.0', config.report, lang.report);
+    `, cssPath, true, config.language, '1.0.0', config.report, lang.report);
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
     console.log(`Generated service/${service.id}.html`);
@@ -361,4 +398,99 @@ async function checkAllServices() {
   console.log('\n✅ HTML files generated successfully!');
 }
 
-checkAllServices().catch(console.error);
+/**
+ * Generate landing page for template mode
+ */
+function generateLandingPage() {
+  console.log('\n📄 Generating landing page (template mode)...');
+  
+  const landingHTML = generateHTML('Status Monitor - Zero-dependency GitHub Pages uptime monitoring', `
+    <div class="landing-hero">
+      <h1 class="landing-title">📊 Status Monitor</h1>
+      <p class="landing-subtitle">Zero-dependency uptime monitoring for GitHub Pages</p>
+      <div class="landing-cta">
+        <a href="demo/index.html" class="btn btn-primary">View Demo</a>
+        <a href="https://github.com/salteadorneo/status" class="btn btn-secondary" target="_blank">Use Template</a>
+      </div>
+    </div>
+
+    <div class="features">
+      <h2>Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>🚀 Zero Dependencies</h3>
+          <p>Pure Node.js with ES modules. No external packages needed.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📊 Static Generation</h3>
+          <p>Works perfectly with GitHub Pages. No servers required.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🔄 Automated Checks</h3>
+          <p>GitHub Actions runs checks every 10 minutes automatically.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🔔 Issue Tracking</h3>
+          <p>Automatic GitHub Issues creation for service outages.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🌐 JSON API</h3>
+          <p>RESTful endpoints for each service status and history.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🎨 Dark Mode</h3>
+          <p>Minimal design that respects system theme preference.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-start">
+      <h2>Quick Start</h2>
+      <ol>
+        <li>
+          <strong>Use this template</strong>
+          <pre>Click "Use this template" button on GitHub</pre>
+        </li>
+        <li>
+          <strong>Configure services</strong>
+          <pre>Edit config.yml with your services to monitor</pre>
+        </li>
+        <li>
+          <strong>Enable GitHub Pages</strong>
+          <pre>Settings → Pages → Deploy from main branch</pre>
+        </li>
+        <li>
+          <strong>Done!</strong>
+          <pre>Your status page will be live at username.github.io/repo</pre>
+        </li>
+      </ol>
+    </div>
+
+    <div class="example-config">
+      <h2>Configuration Example</h2>
+      <pre><code>language: en
+
+checks:
+  - name: My Website
+    url: https://example.com
+  
+  - name: API
+    url: https://api.example.com/health
+    method: GET
+    expected: 200</code></pre>
+    </div>
+  `, 'global.css', false, 'en', '1.0.0', config.report, lang.report);
+  
+  fs.writeFileSync(path.join(__dirname, 'index.html'), landingHTML);
+  console.log('Generated landing at /index.html');
+}
+
+async function main() {
+  await checkAllServices();
+  
+  if (IS_TEMPLATE) {
+    generateLandingPage();
+  }
+}
+
+main().catch(console.error);

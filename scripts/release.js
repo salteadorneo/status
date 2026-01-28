@@ -10,11 +10,7 @@
  */
 
 import { getLatestVersion, hasUnreleasedChanges, createRelease } from './changelog.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const isDry = args.includes('--dry') || args.includes('-d');
 const releaseType = args.find(arg => ['major', 'minor', 'patch'].includes(arg)) || 'patch';

@@ -16,7 +16,6 @@ const changelogPath = path.join(__dirname, '..', 'CHANGELOG.md');
  */
 export function parseChangelog() {
   const content = fs.readFileSync(changelogPath, 'utf8');
-  // Normalize line endings (Windows \r\n or Unix \n)
   const normalizedContent = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const lines = normalizedContent.split('\n');
   const versions = {};
@@ -26,7 +25,6 @@ export function parseChangelog() {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     
-    // Match version headers: ## [1.0.0] - 2026-01-28 or ## [Unreleased]
     const versionMatch = line.match(/^## \[([^\]]+)\](?:\s*-\s*(.+))?$/);
     
     if (versionMatch) {
@@ -37,13 +35,11 @@ export function parseChangelog() {
         sections: {}
       };
     } else if (currentVersion && line.match(/^### /)) {
-      // Extract section name: ### Added
       currentSection = line.replace(/^### /, '').trim();
       if (!versions[currentVersion].sections[currentSection]) {
         versions[currentVersion].sections[currentSection] = [];
       }
     } else if (currentVersion && currentSection && line.trim().startsWith('- ')) {
-      // Extract item text without leading dash
       const itemText = line.trim().substring(1).trim();
       versions[currentVersion].sections[currentSection].push(itemText);
     }
@@ -81,7 +77,6 @@ export function getLatestVersion() {
   const releases = Object.keys(versions)
     .filter(v => v !== 'Unreleased')
     .sort((a, b) => {
-      // Sort by semantic version
       const aParts = a.split('.').map(Number);
       const bParts = b.split('.').map(Number);
       for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
@@ -115,12 +110,10 @@ export function createRelease(version, date) {
   const { raw: content } = parseChangelog();
   const unreleased = getUnreleasedChanges();
 
-  // Check if unreleased section exists and has content
   if (!unreleased || Object.keys(unreleased.sections).length === 0) {
     return false;
   }
 
-  // Generate new release section
   let releaseSection = `## [${version}] - ${date}\n\n`;
   for (const [section, items] of Object.entries(unreleased.sections)) {
     if (items.length > 0) {
@@ -129,7 +122,6 @@ export function createRelease(version, date) {
     }
   }
 
-  // Replace Unreleased section with new release
   const unreleasedPattern = /## \[Unreleased\]([\s\S]*?)(?=## \[|$)/;
   const newContent = content.replace(
     unreleasedPattern,
@@ -150,17 +142,14 @@ export function createRelease(version, date) {
 export function addUnreleasedEntry(section, message) {
   let content = fs.readFileSync(changelogPath, 'utf8');
   
-  // Find or create section under Unreleased
   const sectionPattern = new RegExp(`(## \\[Unreleased\\].*?### ${section})\n`, 's');
   
   if (sectionPattern.test(content)) {
-    // Section exists, add entry
     content = content.replace(
       sectionPattern,
       `$1\n- ${message}\n`
     );
   } else {
-    // Section doesn't exist, create it
     const insertPattern = /(## \[Unreleased\].*?)(## \[|$)/s;
     content = content.replace(
       insertPattern,
