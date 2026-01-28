@@ -354,19 +354,21 @@ async function checkAllServices() {
         <div class="stat-card operational">
           <div class="label">${lang.operationalServices}</div>
           <div class="value">${metrics.up}/${metrics.total}</div>
-          <div class="description">${((metrics.up/metrics.total)*100).toFixed(0)}%</div>
         </div>
         
         <div class="stat-card issues">
           <div class="label">${lang.issues}</div>
           <div class="value">${metrics.down}</div>
-          <div class="description">${metrics.down === 0 ? lang.none : lang.down}</div>
         </div>
         
         <div class="stat-card">
           <div class="label">${lang.avgResponseTime}</div>
           <div class="value">${metrics.avgResponseTime}ms</div>
-          <div class="description">${lang.average}</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="label">${lang.lastVerification}</div>
+          <div class="value">${formatDate(now.toISOString(), locale)}</div>
         </div>
       </div>
       
@@ -461,30 +463,25 @@ function generateServicePages(results, now) {
         </div>
         
         ${current ? `
-        <div class="service-stats">
-          <div class="service-stat">
-            <div class="label">${lang.responseTime}</div>
-            <div class="value">${current.responseTime}ms ${trend}</div>
-          </div>
-          
-          <div class="service-stat">
+        <div class="stats-grid">
+          <div class="stat-card">
             <div class="label">${lang.uptime}</div>
             <div class="value">${uptime}%</div>
           </div>
           
-          <div class="service-stat">
+          <div class="stat-card">
             <div class="label">${lang.avgResponseTime}</div>
             <div class="value">${avgTime}ms</div>
           </div>
           
-          <div class="service-stat">
+          <div class="stat-card">
             <div class="label">${lang.incidents}</div>
             <div class="value">${incidentsCount}</div>
           </div>
           
-          <div class="service-stat">
+          <div class="stat-card">
             <div class="label">${lang.lastVerification}</div>
-            <div class="value" style="font-size: 0.75rem;">${formatDate(current.timestamp, locale)}</div>
+            <div class="value">${formatDate(current.timestamp, locale)}</div>
           </div>
         </div>
         
