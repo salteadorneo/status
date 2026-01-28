@@ -81,7 +81,7 @@ body {
 header,
 main,
 footer {
-  max-width: 900px;
+  max-width: 820px;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -92,7 +92,14 @@ header {
   align-items: center;
   padding: 4rem 1rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
+
+  nav {
+    text-align: right;
+  }
+
+  @media (max-width: 600px) {
+    padding: 2rem 1rem;
+  }
 }
 
 footer {
@@ -109,15 +116,6 @@ footer {
     color: var(--text-color);
     text-decoration: none;
   }
-}
-
-.header-left, .header-right {
-  display: flex;
-  align-items: center;
-}
-
-.header-right {
-  font-size: 0.9rem;
 }
 
 .title {
@@ -147,7 +145,6 @@ footer {
   padding: 1rem;
   border-radius: 6px;
   margin: 1rem 0;
-  border: 1px solid;
   text-align: center;
 
   .last-update {
@@ -157,26 +154,19 @@ footer {
 
 .overall-status-banner.operational {
   background: rgba(0, 170, 0, 0.1);
-  border-color: var(--up-color);
-  color: var(--up-color);
 }
 
 .overall-status-banner.partial {
   background: rgba(255, 170, 0, 0.1);
-  border-color: #fa0;
-  color: #fa0;
 }
 
 .overall-status-banner.major {
   background: rgba(221, 0, 0, 0.1);
-  border-color: var(--down-color);
-  color: var(--down-color);
 }
 
 @media (prefers-color-scheme: dark) {
   .overall-status-banner.partial {
     background: rgba(255, 170, 0, 0.15);
-    color: #fc6;
   }
 }
 
@@ -274,10 +264,12 @@ a {
 
 .method-badge {
   display: inline-block;
+  vertical-align: middle;
   padding: 0.2rem 0.5rem;
   font-weight: bold;
   border-radius: 3px;
   background: rgba(0, 100, 200, 0.15);
+  font-size: 1rem;
   color: var(--link-color);
   border: 1px solid var(--link-color);
   white-space: nowrap;
@@ -478,13 +470,12 @@ details {
 }
 
 .service-header {
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
   margin-bottom: 2rem;
   overflow-x: auto;
 
   h2 {
     font-size: 2rem;
+    margin-bottom: 1rem;
   }
 }
 

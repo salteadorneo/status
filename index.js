@@ -288,14 +288,15 @@ function generateServiceCard(checkResult, configService) {
   const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(1) : 100;
   const trend = calculateTrend(allHistory, checkResult.responseTime);
   const historyBar = generateHistoryBar(allHistory, '72h', locale);
-  const methodBadge = getMethodBadge(configService);
   
   return `
     <a href="service/${checkResult.id}.html" class="service-card">
       <div class="service-header-row">
         <div class="service-name-status">
           <h3 style="view-transition-name:${checkResult.id}">
-            ${checkResult.name} <span class="${checkResult.status}">●</span>${methodBadge}
+            ${getMethodBadge(configService)}
+            ${checkResult.name}
+            <span class="${checkResult.status}">●</span>
           </h3>
         </div>
         <div class="service-metrics-inline">
@@ -335,8 +336,8 @@ async function checkAllServices() {
   
   const indexHTML = generateHTML(config.title || lang.title, `
     <header>
-      <h1 class="title">${generateTitle(IS_TEMPLATE ? '../index.html' : null)}</h1>
-      ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
+      <h1 class="title">${generateTitle(IS_TEMPLATE ? '../index.html' : 'index.html')}</h1>
+      ${reportLink ? `<nav>${reportLink}</nav>` : ''}
     </header>
     <main>
       <div class="overall-status-banner ${metrics.overallStatus}">
@@ -345,6 +346,7 @@ async function checkAllServices() {
       </div>
       
       <h2>${lang.summary}</h2>
+
       <div class="stats-grid">
         <div class="stat-card operational">
           <div class="label">${lang.operationalServices}</div>
@@ -429,15 +431,14 @@ function generateServicePages(results, now) {
     
     const serviceHTML = generateHTML(`${service.name} - ${lang.status}`, `
       <header>
-        <h1 class="title">${generateTitle(IS_TEMPLATE ? '../../index.html' : null)}</h1>
-        ${reportLink ? `<div class="header-right">${reportLink}</div>` : ''}
+        <h1 class="title">${generateTitle(IS_TEMPLATE ? '../../index.html' : '../index.html')}</h1>
+        ${reportLink ? `<nav>${reportLink}</nav>` : ''}
       </header>
-      <main>        
-        <p><a href="../index.html">← ${lang.backToDashboard}</a></p>
-        
+      <main>
         <div class="service-header">
           <h2 style="view-transition-name:${service.id}">
-            ${service.name} <span class="${current.status}">●</span>
+             <span class="${current.status}">●</span>
+             ${service.name}
           </h2>
           <p>${getMethodBadge(service)} <span style="opacity: 0.8;">${getServiceUrl(service)}</span></p>
         </div>
