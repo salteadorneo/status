@@ -318,14 +318,6 @@ details {
     }
   }
 }
-      background: var(--up-color);
-    }
-
-    &.down {
-      background: var(--down-color);
-    }
-  }
-}
 
 .history-header {
   display: flex;
