@@ -57,5 +57,8 @@
   "badge": "Badge",
   "returnsCurrentStatus": "Returns the current status of this service.",
   "returnsMonthlyChecks": "Returns all checks for a specific month.",
-  "useBadge": "Use this badge to embed the status in other pages:"
+  "useBadge": "Use this badge to embed the status in other pages:",
+  "allSystemsOperational": "All systems operational",
+  "partialOutage": "Partial outage",
+  "majorOutage": "Major outage"
 }

@@ -133,6 +133,22 @@ async function checkAllServices() {
   const avgResponseTime = results.length > 0 ? Math.round(results.reduce((sum, s) => sum + s.responseTime, 0) / results.length) : 0;
   const totalServices = results.length;
   
+  let overallStatus = 'operational';
+  let overallMessage = lang.allSystemsOperational;
+  let overallIcon = '🟢';
+  
+  if (down > 0) {
+    if (down === totalServices) {
+      overallStatus = 'major';
+      overallMessage = lang.majorOutage;
+      overallIcon = '🔴';
+    } else {
+      overallStatus = 'partial';
+      overallMessage = lang.partialOutage;
+      overallIcon = '🟡';
+    }
+  }
+  
   const serviceCards = results.map(s => {
     const allHistory = getServiceHistory(s.id, __dirname);
     const uptimeCount = allHistory.filter(h => h.status === 'up').length;
@@ -166,6 +182,10 @@ async function checkAllServices() {
   const indexHTML = generateHTML(lang.statusMonitor, `
     <h1>${lang.statusMonitor}</h1>
     <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
+    
+    <div class="overall-status-banner ${overallStatus}">
+      ${overallIcon} ${overallMessage}
+    </div>
     
     <h2>${lang.summary}</h2>
     <div class="stats-grid">

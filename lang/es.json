@@ -57,5 +57,8 @@
   "badge": "Badge",
   "returnsCurrentStatus": "Devuelve el estado actual de este servicio.",
   "returnsMonthlyChecks": "Devuelve todas las comprobaciones de un mes específico.",
-  "useBadge": "Usa este badge para mostrar el estado en otras páginas:"
+  "useBadge": "Usa este badge para mostrar el estado en otras páginas:",
+  "allSystemsOperational": "Todos los sistemas operativos",
+  "partialOutage": "Interrupción parcial",
+  "majorOutage": "Interrupción mayor"
 }

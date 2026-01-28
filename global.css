@@ -79,6 +79,41 @@ body {
   color: var(--text-color);
 }
 
+.overall-status-banner {
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border: 2px solid;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.overall-status-banner.operational {
+  background: rgba(0, 170, 0, 0.1);
+  border-color: var(--up-color);
+  color: var(--up-color);
+}
+
+.overall-status-banner.partial {
+  background: rgba(255, 170, 0, 0.1);
+  border-color: #fa0;
+  color: #fa0;
+}
+
+.overall-status-banner.major {
+  background: rgba(221, 0, 0, 0.1);
+  border-color: var(--down-color);
+  color: var(--down-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .overall-status-banner.partial {
+    background: rgba(255, 170, 0, 0.15);
+    color: #fc6;
+  }
+}
+
 a {
   color: var(--link-color);
   text-decoration: none;
