@@ -227,32 +227,65 @@ function calculateMetrics(results) {
 }
 
 /**
- * Generate service card HTML for dashboard
- * @param {CheckResult} service
+ * Get method badge HTML
+ * @param {Service} service
  * @returns {string}
  */
-function generateServiceCard(service) {
-  const allHistory = getServiceHistory(service.id, dataDir);
+function getMethodBadge(service) {
+  if (service.type === 'tcp') {
+    return `<span class="method-badge tcp">TCP</span>`;
+  } else if (service.type === 'dns') {
+    return `<span class="method-badge dns">DNS</span>`;
+  } else {
+    const method = service.method || 'GET';
+    const badgeClass = method.toUpperCase() === 'POST' ? 'post' : '';
+    return `<span class="method-badge ${badgeClass}">${method.toUpperCase()}</span>`;
+  }
+}
+
+/**
+ * Get service URL or description for display
+ * @param {Service} service
+ * @returns {string}
+ */
+function getServiceUrl(service) {
+  if (service.type === 'tcp') {
+    return `${service.host}:${service.port}`;
+  } else if (service.type === 'dns') {
+    return `${service.domain}`;
+  }
+  return service.url;
+}
+
+/**
+ * Generate service card HTML for dashboard
+ * @param {CheckResult} checkResult
+ * @param {Service} configService
+ * @returns {string}
+ */
+function generateServiceCard(checkResult, configService) {
+  const allHistory = getServiceHistory(checkResult.id, dataDir);
   const activeHistory = allHistory.filter(h => h.status !== 'maintenance');
   const uptimeCount = activeHistory.filter(h => h.status === 'up').length;
   const uptime = activeHistory.length > 0 ? (uptimeCount / activeHistory.length * 100).toFixed(1) : 100;
-  const trend = calculateTrend(allHistory, service.responseTime);
+  const trend = calculateTrend(allHistory, checkResult.responseTime);
   const historyBar = generateHistoryBar(allHistory, '72h', locale);
+  const methodBadge = getMethodBadge(configService);
   
   return `
-    <a href="service/${service.id}.html" class="service-card">
+    <a href="service/${checkResult.id}.html" class="service-card">
       <div class="service-header-row">
         <div class="service-name-status">
-          <h3 style="view-transition-name:${service.id}">
-            ${service.name} <span class="${service.status}">●</span>
+          <h3 style="view-transition-name:${checkResult.id}">
+            ${checkResult.name} <span class="${checkResult.status}">●</span>${methodBadge}
           </h3>
         </div>
         <div class="service-metrics-inline">
-          <span class="metric-item">${service.responseTime}ms ${trend}</span>
+          <span class="metric-item">${checkResult.responseTime}ms ${trend}</span>
           <span class="metric-item">${uptime}%</span>
         </div>
       </div>
-      <div class="service-history" style="view-transition-name:${service.id}-history">
+      <div class="service-history" style="view-transition-name:${checkResult.id}-history">
         ${historyBar}
         <div class="history-labels">
           <span>72 ${lang.hoursAgo}</span>
@@ -275,7 +308,10 @@ async function checkAllServices() {
   
   const metrics = calculateMetrics(results);
   
-  const serviceCards = results.map(s => generateServiceCard(s)).join('');
+  const serviceCards = results.map(result => {
+    const origService = config.services.find(s => s.id === result.id);
+    return generateServiceCard(result, origService);
+  }).join('');
   
   const reportLink = generateReportLink(config.report, lang.report);
   
@@ -399,7 +435,7 @@ function generateServicePages(results, now) {
         <h2 style="view-transition-name:${service.id}">
           ${service.name} <span class="${current.status}">●</span>
         </h2>
-        <p><a href="${service.url}" target="_blank">${service.url}</a></p>
+        <p>${getMethodBadge(service)} <span style="opacity: 0.8;">${getServiceUrl(service)}</span></p>
       </div>
       
       ${current ? `
@@ -461,11 +497,27 @@ function generateServicePages(results, now) {
       
       <details open>
         <summary>${lang.api}</summary>
-        <p><pre>GET https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json</pre></p>
-        <p>${lang.returnsCurrentStatus}</p>
-        
-        <p><pre>GET https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json</pre></p>
-        <p>${lang.returnsMonthlyChecks}</p>
+        <div class="api-endpoints">
+          <div class="api-endpoint">
+            <div class="endpoint-header">
+              <span class="endpoint-url">GET /api/${service.id}/status.json</span>
+            </div>
+            <p class="endpoint-description">${lang.returnsCurrentStatus}</p>
+            <div class="endpoint-request">
+              <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/status.json</div>
+            </div>
+          </div>
+          
+          <div class="api-endpoint">
+            <div class="endpoint-header">
+              <span class="endpoint-url">GET /api/${service.id}/history/YYYY-MM.json</span>
+            </div>
+            <p class="endpoint-description">${lang.returnsMonthlyChecks}</p>
+            <div class="endpoint-request">
+              <div class="endpoint-code">curl https://salteadorneo.github.io/status${paths.apiAbs}/${service.id}/history/YYYY-MM.json</div>
+            </div>
+          </div>
+        </div>
       </details>
       
       <details open>
