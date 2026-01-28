@@ -1,6 +1,16 @@
 name: Status Check & Deploy
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'config.yml'
+      - 'config.json'
+      - 'index.js'
+      - 'lib/**'
+      - 'src/**'
+      - '.github/**'
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
