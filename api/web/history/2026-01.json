@@ -285,5 +285,33 @@
     "statusCode": 200,
     "responseTime": 199,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-28T14:34:19.221Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 317,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T14:53:49.216Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 124,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T15:12:44.716Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 295,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T15:33:16.654Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 236,
+    "error": null
   }
 ]

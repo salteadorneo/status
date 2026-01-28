@@ -404,5 +404,33 @@
     "statusCode": 404,
     "responseTime": 81,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-28T14:34:19.221Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 81,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T14:53:49.216Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 71,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T15:12:44.716Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 61,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T15:33:16.654Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 54,
+    "error": null
   }
 ]
