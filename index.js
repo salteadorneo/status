@@ -371,15 +371,16 @@ async function checkAllServices() {
     <a href="service/${s.id}.html" class="service-card">
       <div class="service-header-row">
         <div class="service-name-status">
-          <h3>${s.name}</h3>
-          <span class="status-badge ${s.status}">●</span>
+          <h3 style="view-transition-name:${s.id}">
+            ${s.name} <span class="${s.status}">●</span>
+          </h3>
         </div>
         <div class="service-metrics-inline">
           <span class="metric-item">${s.responseTime}ms ${trend}</span>
           <span class="metric-item">${uptime}%</span>
         </div>
       </div>
-      <div class="service-history">
+      <div class="service-history" style="view-transition-name:${s.id}-history">
         ${historyBar}
         <div class="history-labels">
           <span>60 days ago</span>
@@ -427,8 +428,6 @@ async function checkAllServices() {
   if (!fs.existsSync(serviceHtmlDir)) fs.mkdirSync(serviceHtmlDir, { recursive: true });
   
   config.services.forEach(service => {
-    const historyDir = path.join(__dirname, 'api', service.id, 'history');
-    const historyFiles = fs.existsSync(historyDir) ? fs.readdirSync(historyDir).filter(f => f.endsWith('.json')).sort().reverse() : [];
     const allHistory = getServiceHistory(service.id);
     
     const uptimeCount = allHistory.filter(s => s.status === 'up').length;
@@ -450,10 +449,15 @@ async function checkAllServices() {
     }).join('');
     
     const serviceHTML = html(`${service.name} - ${lang.status}`, `
+      <h1>${lang.statusMonitor}</h1>
+      <p class="last-update">${lang.lastUpdate}: ${formatDate(now.toISOString())}</p>
+      
       <p><a href="../index.html">← ${lang.backToDashboard}</a></p>
       
       <div class="service-header">
-        <h1>${service.name} ${current ? `<span class="${current.status}">●</span>` : ''}</h1>
+        <h2 style="view-transition-name:${service.id}">
+          ${service.name} <span class="${current.status}">●</span>
+        </h2>
         <p><a href="${service.url}" target="_blank">${service.url}</a></p>
       </div>
       
@@ -496,7 +500,7 @@ async function checkAllServices() {
           <button class="filter-btn" data-period="24h" aria-pressed="false">24h</button>
         </div>
       </div>
-      <div class="history-container">
+      <div class="history-container" style="view-transition-name:${service.id}-history">
         <div>${historyBar60d}</div>
         <div style="display: none;">${historyBar30d}</div>
         <div style="display: none;">${historyBar24h}</div>
@@ -518,10 +522,12 @@ async function checkAllServices() {
         <p style="margin:0;">Returns all checks for a specific month.</p>
       </details>
       
-      <h2>Badge</h2>
-      <p>Use this badge to embed the status in other pages:</p>
-      <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
-      <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
+      <details>
+        <summary><h2>Badge</h2></summary>
+        <p>Use this badge to embed the status in other pages:</p>
+        <pre>![${service.name}](https://salteadorneo.github.io/status/badge/${service.id}.svg)</pre>
+        <p><img src="../badge/${service.id}.svg" alt="${service.name} status"></p>
+      </details>
     `, '../global.css', true);
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);

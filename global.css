@@ -20,6 +20,10 @@
  }
 }
 
+@view-transition {
+  navigation: auto;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -36,18 +40,6 @@ body {
 
 header {
   margin-bottom: 2rem;
-}
-
-h1 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-weight: normal;
-}
-
-h2 {
-  font-size: 1.2rem;
-  margin: 1.5rem 0 1rem;
-  font-weight: normal;
 }
 
 a {
@@ -132,11 +124,6 @@ a:hover {
   align-items: center;
 }
 
-.service-name-status h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
 .service-metrics-inline {
   display: flex;
   gap: 1rem;
@@ -157,13 +144,6 @@ a:hover {
   font-size: 0.75rem;
   opacity: 0.6;
   margin-top: 0.25rem;
-}
-
-.service-info h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  font-weight: bold;
-  color: inherit;
 }
 
 .service-info .service-url {
@@ -227,11 +207,6 @@ details {
     cursor: pointer;
     user-select: none;
 
-    h2 {
-      display: inline-block;
-      margin: 0;
-    }
-
     &:hover {
       opacity: 0.8;
     }
@@ -266,10 +241,6 @@ details {
   justify-content: space-between;
   align-items: center;
   margin: 1.5rem 0 0.5rem;
-
-  h2 {
-    margin: 0;
-  }
 }
 
 .history-filters {
@@ -420,10 +391,6 @@ body:not(:has(.services-grid)) table td {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
-
-    h2 {
-      margin-bottom: 0;
-    }
   }
 }
 
