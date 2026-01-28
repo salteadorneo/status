@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.0.4] - 2026-01-28
+
+### Added
+- Generate landing page links based on `IS_TEMPLATE` flag
+
 ## [1.0.3] - 2026-01-28
 
 ### Added
