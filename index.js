@@ -69,15 +69,37 @@ if (fs.existsSync(yamlPath)) {
   const parsed = parseYAML(yamlContent);
   config = {
     language: parsed.language || 'en',
-    services: (parsed.checks || parsed.services || []).map((check, index) => ({
-      id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      name: check.name,
-      url: check.url,
-      method: check.method || 'GET',
-      expectedStatus: check.expectedStatus || check.expected || 200,
-      timeout: check.timeout || 10000,
-      maintenance: check.maintenance || null
-    }))
+    services: (parsed.checks || parsed.services || []).map((check, index) => {
+      const baseConfig = {
+        id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name: check.name,
+        type: check.type || 'http',
+        timeout: check.timeout || 10000,
+        maintenance: check.maintenance || null
+      };
+      
+      // Campos específicos según el tipo
+      if (check.type === 'tcp') {
+        return {
+          ...baseConfig,
+          host: check.host,
+          port: check.port
+        };
+      } else if (check.type === 'dns') {
+        return {
+          ...baseConfig,
+          domain: check.domain
+        };
+      } else {
+        // HTTP por defecto
+        return {
+          ...baseConfig,
+          url: check.url,
+          method: check.method || 'GET',
+          expectedStatus: check.expectedStatus || check.expected || 200
+        };
+      }
+    })
   };
 } else {
   config = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));

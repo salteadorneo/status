@@ -19,12 +19,22 @@ export async function manageIssues(github, context) {
     const yamlContent = fs.readFileSync(yamlPath, 'utf-8');
     const parsed = parseYAML(yamlContent);
     config = {
-      services: (parsed.checks || parsed.services || []).map((check) => ({
-        id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        name: check.name,
-        url: check.url,
-        maintenance: check.maintenance || null
-      }))
+      services: (parsed.checks || parsed.services || []).map((check) => {
+        const base = {
+          id: check.id || check.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          name: check.name,
+          maintenance: check.maintenance || null,
+          type: check.type || 'http'
+        };
+        
+        if (check.type === 'tcp') {
+          return { ...base, url: `${check.host}:${check.port}` };
+        } else if (check.type === 'dns') {
+          return { ...base, url: check.domain };
+        } else {
+          return { ...base, url: check.url };
+        }
+      })
     };
   } else {
     config = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));

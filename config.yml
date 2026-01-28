@@ -12,3 +12,12 @@ checks:
     url: https://example.com/api/status
     method: POST
     expected: 405
+
+  - name: Example TCP
+    type: tcp
+    host: db.example.com
+    port: 5432
+  
+  - name: Example DNS
+    type: dns
+    domain: github.com
