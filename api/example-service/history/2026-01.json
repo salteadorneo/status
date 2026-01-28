@@ -117,5 +117,33 @@
     "statusCode": 404,
     "responseTime": 81,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-28T00:18:51.032Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 37,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T00:40:47.133Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 40,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T01:19:14.138Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 70,
+    "error": null
+  },
+  {
+    "timestamp": "2026-01-28T02:08:13.802Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 48,
+    "error": null
   }
 ]
