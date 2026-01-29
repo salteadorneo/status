@@ -334,5 +334,12 @@
     "statusCode": null,
     "responseTime": 0,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-29T11:05:34.826Z",
+    "status": "maintenance",
+    "statusCode": null,
+    "responseTime": 0,
+    "error": null
   }
 ]
