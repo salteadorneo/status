@@ -1244,5 +1244,12 @@
     "statusCode": 200,
     "responseTime": 230,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-31T11:00:07.201Z",
+    "status": "up",
+    "statusCode": 200,
+    "responseTime": 130,
+    "error": null
   }
 ]
