@@ -1286,5 +1286,12 @@
     "statusCode": null,
     "responseTime": 2,
     "error": null
+  },
+  {
+    "timestamp": "2026-01-31T12:34:17.760Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 18,
+    "error": null
   }
 ]
