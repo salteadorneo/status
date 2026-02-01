@@ -124,5 +124,12 @@
     "statusCode": 405,
     "responseTime": 37,
     "error": null
+  },
+  {
+    "timestamp": "2026-02-01T09:50:26.655Z",
+    "status": "up",
+    "statusCode": 405,
+    "responseTime": 125,
+    "error": null
   }
 ]
