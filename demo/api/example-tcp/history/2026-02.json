@@ -551,5 +551,12 @@
     "statusCode": null,
     "responseTime": 45,
     "error": "getaddrinfo ENOTFOUND db.example.com"
+  },
+  {
+    "timestamp": "2026-02-02T07:15:08.524Z",
+    "status": "down",
+    "statusCode": null,
+    "responseTime": 28,
+    "error": "getaddrinfo ENOTFOUND db.example.com"
   }
 ]
