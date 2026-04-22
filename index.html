@@ -3,96 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  
-  <title>Status - Zero-dependency GitHub Pages uptime monitoring</title>
+  <title>Status — Uptime monitoring for GitHub Pages</title>
   <link rel="stylesheet" href="src/global.css" />
 </head>
 <body>
 
-    <main>
-      <div class="landing-hero">
-        <h1 class="landing-title">📊 Status</h1>
-        <p class="landing-subtitle">Zero-dependency uptime monitoring for GitHub Pages</p>
-        <div class="landing-cta">
-          <a href="demo/index.html" class="btn btn-primary">View Demo</a>
-          <a href="https://github.com/salteadorneo/status" class="btn btn-secondary" target="_blank">Use Template</a>
-        </div>
-      </div>
+<header>
+  <div class="title">Status</div>
+  <nav>
+    <a href="https://github.com/salteadorneo/status" class="header-link" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </nav>
+</header>
 
-      <div class="features">
-        <h2>Features</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <h3>🚀 Zero Dependencies</h3>
-            <p>Pure Node.js with ES modules. No external packages needed.</p>
-          </div>
-          <div class="feature-card">
-            <h3>📊 Static Generation</h3>
-            <p>Works perfectly with GitHub Pages. No servers required.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🔄 Automated Checks</h3>
-            <p>GitHub Actions runs checks every 10 minutes automatically.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🔔 Issue Tracking</h3>
-            <p>Automatic GitHub Issues creation for service outages.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🌐 JSON API</h3>
-            <p>RESTful endpoints for each service status and history.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🎨 Dark Mode</h3>
-            <p>Minimal design that respects system theme preference.</p>
-          </div>
-        </div>
-      </div>
+<main>
+  <div class="landing-hero">
+    <span class="hero-eyebrow">Open source · Free forever</span>
+    <h1 class="landing-title">Uptime monitoring<br>for GitHub Pages</h1>
+    <p class="landing-subtitle">Deploy a professional status page in minutes. Powered by GitHub Actions — no servers, no subscriptions, no ops overhead.</p>
+    <div class="landing-cta">
+      <a href="demo/index.html" class="btn btn-primary">View Demo</a>
+      <a href="https://github.com/salteadorneo/status" class="btn btn-secondary" target="_blank">Use Template →</a>
+    </div>
+  </div>
 
-      <div class="quick-start">
-        <h2>Quick Start</h2>
-        <ol>
-          <li>
-            <strong>Use this template</strong>
-            <pre>Click "Use this template" button on GitHub</pre>
-          </li>
-          <li>
-            <strong>Configure services</strong>
-            <pre>Edit config.yml with your services to monitor</pre>
-          </li>
-          <li>
-            <strong>Enable GitHub Pages</strong>
-            <pre>Settings → Pages → Deploy from main branch</pre>
-          </li>
-          <li>
-            <strong>Done!</strong>
-            <pre>Your status page will be live at username.github.io/repo</pre>
-          </li>
-        </ol>
+  <div class="features">
+    <h2>Everything included, nothing to maintain</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>Zero Dependencies</h3>
+        <p>Pure Node.js with no external packages. No dependency updates, no supply chain risk, no lock-in.</p>
       </div>
-
-      <div class="example-config">
-        <h2>Configuration Example</h2>
-        <pre><code>language: en
-
-  checks:
-    - name: My Website
-      url: https://example.com
-    
-    - name: API
-      url: https://api.example.com/health
-      method: GET
-      expected: 200</code></pre>
+      <div class="feature-card">
+        <h3>Static Generation</h3>
+        <p>Deploys to GitHub Pages. No servers to provision, no infrastructure bills, no downtime to worry about.</p>
       </div>
-    </main>
-  
+      <div class="feature-card">
+        <h3>Automated Checks</h3>
+        <p>GitHub Actions checks your services every 10 minutes, around the clock, without any intervention.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Incident Tracking</h3>
+        <p>Opens a GitHub Issue when a service goes down. Closes it automatically when the service recovers.</p>
+      </div>
+      <div class="feature-card">
+        <h3>JSON API</h3>
+        <p>REST endpoints expose current status and full historical data for each monitored service.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Dark Mode</h3>
+        <p>Adapts to the visitor's system preference automatically. No JavaScript required, no flash.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-start">
+    <h2>Up and running in minutes</h2>
+    <ol>
+      <li>
+        <strong>Fork the template</strong>
+        <p class="step-detail">Click "Use this template" on GitHub to create your own copy of the repository</p>
+      </li>
+      <li>
+        <strong>Configure your services</strong>
+        <p class="step-detail">Edit <code>config.yml</code> and add the endpoints you want to monitor</p>
+      </li>
+      <li>
+        <strong>Enable GitHub Pages</strong>
+        <p class="step-detail">Go to Settings → Pages and set the source to the main branch</p>
+      </li>
+      <li>
+        <strong>You're live</strong>
+        <p class="step-detail">Your status page is published at <code>username.github.io/repo</code></p>
+      </li>
+    </ol>
+  </div>
+
+  <div class="example-config">
+    <h2>Simple configuration</h2>
+    <pre><code>language: en
+
+checks:
+  - name: My Website
+    url: https://example.com
+
+  - name: API
+    url: https://api.example.com/health
+    method: GET
+    expected: 200</code></pre>
+  </div>
+</main>
+
 <footer>
   <a href="https://github.com/salteadorneo/status" target="_blank" rel="noopener">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
     salteadorneo/status
-  </a>&nbsp;v1.0.5
-  &nbsp;·&nbsp;<a href="https://github.com/salteadorneo/status/issues/new" target="_blank" rel="noopener">Reportar un problema</a>
+  </a>
+  &nbsp;·&nbsp;v1.0.5
+  &nbsp;·&nbsp;<a href="https://github.com/salteadorneo/status/issues/new" target="_blank" rel="noopener">Report an issue</a>
 </footer>
+
 <script src="src/main.js"></script>
 </body>
 </html>
