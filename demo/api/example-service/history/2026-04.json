@@ -54,5 +54,12 @@
     "statusCode": 404,
     "responseTime": 60,
     "error": null
+  },
+  {
+    "timestamp": "2026-04-23T07:42:28.630Z",
+    "status": "down",
+    "statusCode": 404,
+    "responseTime": 31,
+    "error": null
   }
 ]
