@@ -89,5 +89,12 @@
     "statusCode": null,
     "responseTime": 4,
     "error": null
+  },
+  {
+    "timestamp": "2026-04-23T12:33:39.540Z",
+    "status": "up",
+    "statusCode": null,
+    "responseTime": 6,
+    "error": null
   }
 ]
