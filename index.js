@@ -384,7 +384,8 @@ async function checkAllServices() {
     version,
     report: config.report,
     reportText: lang.report,
-    noindex: config.noindex
+    noindex: config.noindex,
+    bodyClass: 'status-page'
   });
   
   const baseDir = IS_TEMPLATE ? path.join(__dirname, 'demo') : __dirname;
@@ -557,7 +558,8 @@ function generateServicePages(results, now) {
       version,
       report: config.report,
       reportText: lang.report,
-      noindex: config.noindex
+      noindex: config.noindex,
+      bodyClass: 'status-page'
     });
     
     fs.writeFileSync(path.join(serviceHtmlDir, `${service.id}.html`), serviceHTML);
@@ -572,88 +574,205 @@ function generateLandingPage() {
   console.log('\n📄 Generating landing page (template mode)...');
   
   const landingHTML = generateHTML({
-    title: 'Status - Zero-dependency GitHub Pages uptime monitoring',
+    title: 'Status — monitorización ligera para GitHub Pages',
     body: `
-    <main>
-      <div class="landing-hero">
-        <h1 class="landing-title">📊 Status</h1>
-        <p class="landing-subtitle">Zero-dependency uptime monitoring for GitHub Pages</p>
-        <div class="landing-cta">
-          <a href="demo/index.html" class="btn btn-primary">View Demo</a>
-          <a href="https://github.com/salteadorneo/status" class="btn btn-secondary" target="_blank">Use Template</a>
+    <header class="landing-nav">
+      <a class="brand" href="#" aria-label="Status, inicio">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Status</span>
+      </a>
+      <nav aria-label="Navegación principal">
+        <a href="#comparativa">Comparativa</a>
+        <a href="#puesta-en-marcha">Cómo empezar</a>
+        <a class="nav-github" href="https://github.com/salteadorneo/status" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="landing-main">
+        <section class="hero hero-centered" aria-labelledby="hero-title">
+        <div class="hero-copy">
+            <p class="hero-kicker"><span aria-hidden="true"></span> Monitorización y página de estado para GitHub Pages</p>
+            <h1 class="landing-title" id="hero-title">Detecta el problema.<br>Cuenta lo que pasa.</h1>
+            <p class="hero-description">Comprueba tus servicios cada 10 minutos y publica su estado en una página estática. Sin servidor propio ni dependencias externas.</p>
+          <div class="landing-cta">
+              <a href="https://github.com/salteadorneo/status" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Usar esta plantilla</a>
+              <a href="demo/index.html" class="btn btn-secondary">Ver la página de estado</a>
+          </div>
+          </div>
+
+          <div class="product-preview" aria-label="Vista ilustrativa del panel de monitorización y la página de estado">
+            <div class="monitor-window">
+              <div class="preview-topbar">
+                <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="preview-breadcrumb">Status <span>/</span> Monitores</span>
+                <span class="preview-tag">Vista de ejemplo</span>
+              </div>
+              <div class="monitor-content">
+                <aside class="monitor-sidebar" aria-hidden="true">
+                  <span class="sidebar-mark"></span>
+                  <i></i><i></i><i></i><i></i>
+                  <span class="sidebar-bottom"></span>
+                </aside>
+                <div class="monitor-main">
+                  <div class="monitor-heading">
+                    <div><span>MONITORIZACIÓN</span><h2>Todos tus servicios</h2></div>
+                    <span class="checks-frequency"><i></i> Checks cada 10 min</span>
+                  </div>
+                  <div class="monitor-table">
+                    <div class="monitor-table-head"><span>Servicio</span><span>Estado</span><span>Último check</span></div>
+                    <div class="monitor-row">
+                      <span class="monitor-service"><i class="service-symbol">W</i><span>Web<small>example.com</small></span></span>
+                      <span class="status-pill"><i></i> Operativo</span><span class="check-value">200 OK</span>
+                    </div>
+                    <div class="monitor-row">
+                      <span class="monitor-service"><i class="service-symbol api-symbol">A</i><span>API<small>api.example.com</small></span></span>
+                      <span class="status-pill"><i></i> Operativo</span><span class="check-value">200 OK</span>
+                    </div>
+                    <div class="monitor-row">
+                      <span class="monitor-service"><i class="service-symbol db-symbol">D</i><span>Base de datos<small>db.example.com:5432</small></span></span>
+                      <span class="status-pill"><i></i> Operativo</span><span class="check-value">TCP</span>
+                    </div>
+                  </div>
+                  <div class="preview-foot"><span><i></i> Comprobaciones automáticas</span><span>HTTP · TCP · DNS</span></div>
+                </div>
+              </div>
+            </div>
+            <aside class="status-window">
+              <div class="public-page-brand"><span class="public-brand-mark"></span><strong>Mi plataforma</strong><span class="public-menu" aria-hidden="true">•••</span></div>
+              <div class="public-status">
+                <span class="public-status-icon">✓</span>
+                <div><strong>Todos los sistemas operativos</strong><span>Estado actual · vista de ejemplo</span></div>
+              </div>
+              <div class="uptime-label"><strong>Historial de disponibilidad</strong><span>Últimos 30 días</span></div>
+              <div class="uptime-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="public-services"><span>Web</span><strong>Operativo</strong><span>API</span><strong>Operativo</strong></div>
+            </aside>
+            <p class="preview-caption">Una muestra de la información que puedes publicar. <span>Los datos son ilustrativos.</span></p>
+          </div>
+        </section>
+
+      <section class="comparison-section" id="comparativa" aria-labelledby="comparison-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Elige el enfoque que te conviene</p>
+            <h2 id="comparison-title">¿Status o una plataforma dedicada?</h2>
+          </div>
+          <p>Las páginas de estado resuelven necesidades distintas. Esta es una comparación de modelos, no de precios ni de planes.</p>
         </div>
-      </div>
 
-      <div class="features">
-        <h2>Features</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <h3>🚀 Zero Dependencies</h3>
-            <p>Pure Node.js with ES modules. No external packages needed.</p>
-          </div>
-          <div class="feature-card">
-            <h3>📊 Static Generation</h3>
-            <p>Works perfectly with GitHub Pages. No servers required.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🔄 Automated Checks</h3>
-            <p>GitHub Actions runs checks every 10 minutes automatically.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🔔 Issue Tracking</h3>
-            <p>Automatic GitHub Issues creation for service outages.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🌐 JSON API</h3>
-            <p>RESTful endpoints for each service status and history.</p>
-          </div>
-          <div class="feature-card">
-            <h3>🎨 Dark Mode</h3>
-            <p>Minimal design that respects system theme preference.</p>
-          </div>
+        <div class="comparison-scroll" tabindex="0" role="region" aria-label="Comparativa de productos de páginas de estado; desplázate horizontalmente para ver todas las opciones">
+          <table class="comparison-table">
+            <caption>Comparación de alojamiento, monitorización y comunicación de incidencias</caption>
+            <thead>
+              <tr>
+                <th scope="col">Qué necesitas</th>
+                <th scope="col" class="current-product">Status</th>
+                <th scope="col"><a href="https://www.atlassian.com/software/statuspage" target="_blank" rel="noopener noreferrer">Atlassian Statuspage</a></th>
+                <th scope="col"><a href="https://betterstack.com/status-page" target="_blank" rel="noopener noreferrer">Better Stack</a></th>
+                <th scope="col"><a href="https://www.cachethq.io/" target="_blank" rel="noopener noreferrer">Cachet</a></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Cómo se aloja</th>
+                <td class="current-product">GitHub Pages; contenido estático generado en tu repositorio</td>
+                <td>Servicio SaaS gestionado</td>
+                <td>Servicio SaaS gestionado</td>
+                <td>Software abierto que alojas y mantienes</td>
+              </tr>
+              <tr>
+                <th scope="row">Detección de fallos</th>
+                <td class="current-product">Checks propios HTTP, TCP y DNS cada 10 min</td>
+                <td>Se conecta con herramientas de monitorización externas</td>
+                <td>Monitorización integrada con la página</td>
+                <td>Normalmente se integra con monitorización externa</td>
+              </tr>
+              <tr>
+                <th scope="row">Incidentes y avisos</th>
+                <td class="current-product">Apertura y cierre automáticos de GitHub Issues</td>
+                <td>Incidentes y suscripciones de clientes</td>
+                <td>Incidentes, suscripciones y opciones de respuesta</td>
+                <td>Componentes e incidentes en tu propia instancia</td>
+              </tr>
+              <tr>
+                <th scope="row">Encaja mejor si...</th>
+                <td class="current-product">Quieres algo simple, estático y ligado a GitHub</td>
+                <td>Necesitas comunicación pública de incidentes y audiencias</td>
+                <td>Prefieres reunir monitorización y comunicación</td>
+                <td>Necesitas control de alojamiento y puedes operarlo</td>
+              </tr>
+              <tr>
+                <th scope="row">Ten en cuenta</th>
+                <td class="current-product">No incluye suscripciones de clientes, SMS ni guardias on-call</td>
+                <td>La detección requiere una herramienta conectada</td>
+                <td>La plataforma gestiona datos y operación</td>
+                <td>Tu equipo gestiona despliegues, actualizaciones y monitorización</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
+        <p class="comparison-note">Las funciones y planes pueden cambiar. Consulta la documentación de cada producto para confirmar los detalles que necesitas.</p>
+      </section>
 
-      <div class="quick-start">
-        <h2>Quick Start</h2>
-        <ol>
-          <li>
-            <strong>Use this template</strong>
-            <pre>Click "Use this template" button on GitHub</pre>
-          </li>
-          <li>
-            <strong>Configure services</strong>
-            <pre>Edit config.yml with your services to monitor</pre>
-          </li>
-          <li>
-            <strong>Enable GitHub Pages</strong>
-            <pre>Settings → Pages → Deploy from main branch</pre>
-          </li>
-          <li>
-            <strong>Done!</strong>
-            <pre>Your status page will be live at username.github.io/repo</pre>
-          </li>
-        </ol>
-      </div>
+      <section class="workflow-section" aria-labelledby="workflow-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Ligero por diseño</p>
+            <h2 id="workflow-title">Menos infraestructura. Lo esencial cubierto.</h2>
+          </div>
+          <p>El resultado son páginas rápidas y datos que puedes servir, enlazar o reutilizar sin desplegar una aplicación de estado aparte.</p>
+        </div>
+        <div class="workflow-grid">
+          <article>
+            <span class="workflow-number">01</span>
+            <h3>Comprueba tus servicios</h3>
+            <p>Configura endpoints HTTP/HTTPS, puertos TCP o resolución DNS. Los checks se ejecutan cada diez minutos.</p>
+          </article>
+          <article>
+            <span class="workflow-number">02</span>
+            <h3>Publica el estado</h3>
+            <p>Se generan una página general, páginas por servicio, historial, badges SVG y endpoints JSON estáticos.</p>
+          </article>
+          <article>
+            <span class="workflow-number">03</span>
+            <h3>Recibe aviso en GitHub</h3>
+            <p>Cuando un servicio cae, se abre una incidencia; al recuperarse, la incidencia se cierra automáticamente.</p>
+          </article>
+        </div>
+      </section>
 
-      <div class="example-config">
-        <h2>Configuration Example</h2>
-        <pre><code>language: en
+      <section class="setup-section" id="puesta-en-marcha" aria-labelledby="setup-title">
+        <div class="setup-copy">
+          <p class="section-kicker">De cero a publicado</p>
+          <h2 id="setup-title">Una configuración y listo.</h2>
+          <ol class="setup-steps">
+            <li><span>Usa la plantilla en GitHub.</span></li>
+            <li><span>Añade tus servicios en <code>config.yml</code>.</span></li>
+            <li><span>Activa GitHub Pages en los ajustes del repositorio.</span></li>
+          </ol>
+          <a class="setup-link" href="https://github.com/salteadorneo/status" target="_blank" rel="noopener noreferrer">Ver instrucciones en GitHub</a>
+        </div>
+        <pre class="config-sample"><code>language: es
 
-  checks:
-    - name: My Website
-      url: https://example.com
-    
-    - name: API
-      url: https://api.example.com/health
-      method: GET
-      expected: 200</code></pre>
-      </div>
+checks:
+  - name: Web
+    url: https://example.com
+
+  - name: API
+    url: https://api.example.com/health
+    expected: 200
+
+  - name: Base de datos
+    type: tcp
+    host: db.example.com
+    port: 5432</code></pre>
+      </section>
     </main>
   `,
     cssPath: 'src/global.css',
-    scriptPath: 'src/main.js',
-    language: 'en',
+    additionalCssPaths: ['src/landing.css'],
+    bodyClass: 'landing-page',
+    language: 'es',
     version,
     report: config.report,
     reportText: lang.report,

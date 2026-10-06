@@ -22,3 +22,12 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+.claude
+*-lock.json
+
+# localhost
+api/
+badge/
+demo/
+service/
