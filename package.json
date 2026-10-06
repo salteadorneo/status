@@ -1,7 +1,7 @@
 {
   "name": "status",
   "type": "module",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Lightweight static status monitoring system for GitHub Pages",
   "license": "MIT",
   "scripts": {
