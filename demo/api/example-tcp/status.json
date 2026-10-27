@@ -1,8 +1,8 @@
 {
-  "lastCheck": "2026-10-27T18:11:37.697Z",
+  "lastCheck": "2026-10-27T19:08:36.881Z",
   "status": "down",
   "statusCode": null,
-  "responseTime": 28,
-  "timestamp": "2026-10-27T18:11:37.433Z",
+  "responseTime": 23,
+  "timestamp": "2026-10-27T19:08:36.460Z",
   "error": "getaddrinfo ENOTFOUND db.example.com"
 }
