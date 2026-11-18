@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const script = document.createElement('script');
+  script.src = 'https://a.salteadorneo.dev/a.js';
+  script.async = true;
+  document.head.appendChild(script);
+
   const filterBtns = document.querySelectorAll('.filter-btn');
   const historyContainers = document.querySelectorAll('.history-container > div');
   
